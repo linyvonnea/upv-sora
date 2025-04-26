@@ -12,12 +12,12 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col md:flex-row justify-center gap-4 pt-4">
-          <Link href="/user/home" className="inline-block">
+          <Link href="/login" className="inline-block">
             <button className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
               Enter as Organization
             </button>
           </Link>
-          <Link href="/admin/home" className="inline-block">
+          <Link href="/login" className="inline-block">
             <button className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
               Enter as SOA Admin
             </button>
