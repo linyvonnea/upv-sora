@@ -1,18 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { EventRequestDialog } from "@/components/ui/event-request-dialog";
+import { Button } from "@/components/ui/button";
+import { EventRequestDialog } from "@/components/user/request-events/event-request-dialog";
 
 export default function UserHomePage() {
-  const [open, setOpen] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <EventRequestDialog open={open} setOpen={setOpen} />
+      <div className="flex gap-4">
+        <Button
+          className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
+          onClick={() => setOpenDialog(true)}
+        >
+          Request an Event
+        </Button>
+      </div>
+
+      <EventRequestDialog open={openDialog} onOpenChange={setOpenDialog} />
     </div>
   );
 }
-
 
 // revamped, calnedar still not working tho
 // "use client";

@@ -7,15 +7,15 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface Step2Props {
-    eventType: "on-campus" | "online" | "off-campus";
-    formData: {
-      title: string;
-      date: Date | undefined;
-      description: string;
-      modality: string;
-    };
-    onSubmit: () => void;
-  }
+  eventType: "on-campus" | "online" | "off-campus";
+  formData: {
+    title: string;
+    date: Date | undefined;
+    description: string;
+    modality: string;
+  };
+  onSubmit: () => void;
+}
 
 export function EventRequestStep2({ eventType, formData, onSubmit }: Step2Props) {
   const [files, setFiles] = useState({
@@ -45,7 +45,9 @@ export function EventRequestStep2({ eventType, formData, onSubmit }: Step2Props)
         onSubmit();
       }}
     >
-      <h2 className="text-lg font-semibold capitalize">Requirements for {formData.modality} event</h2>
+      <h2 className="text-lg font-semibold capitalize">
+        Requirements for {formData.modality} event
+      </h2>
 
       {/* Common Fields */}
       <div className="space-y-1">
