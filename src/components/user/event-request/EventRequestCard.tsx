@@ -10,10 +10,19 @@ export interface EventData {
   id: number;
   title: string;
   requestDate: string;
+  eventDate?: string;
   status: string;
+  organizationName?: string;
+  modality?: "Online" | "On-Site";
+  location?: "Iloilo" | "Miagao";
 }
 
-export function EventRequestCard({ event }: { event: EventData }) {
+interface EventRequestCardProps {
+  event: EventData;
+  showAccordion?: boolean;
+}
+
+export function EventRequestCard({ event, showAccordion = true }: EventRequestCardProps) {
   const [open, setOpen] = useState(false);
 
   // Map status to background/text color
@@ -28,15 +37,33 @@ export function EventRequestCard({ event }: { event: EventData }) {
 
   return (
     <div
-      className={cn("border rounded-lg p-4 cursor-pointer transition", open && "bg-muted/40")}
-      onClick={() => setOpen((prev) => !prev)}
+      className={cn(
+        "border rounded-lg p-4 transition",
+        showAccordion ? "cursor-pointer" : "",
+        open && "bg-muted/40"
+      )}
+      onClick={showAccordion ? () => setOpen((prev) => !prev) : undefined}
     >
       <div className="flex justify-between items-center">
         <div>
+          {/* Organization Name on top */}
+          {event.organizationName && (
+            <div className="mb-1">
+              <span className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-medium">
+                {event.organizationName}
+              </span>
+            </div>
+          )}
           <h3 className="font-bold text-lg">{event.title}</h3>
-          <p className="text-sm text-muted-foreground">Request Date: {event.requestDate}</p>
+          <p className="text-sm text-muted-foreground">
+            <b>Request Date:</b> {event.requestDate}
+          </p>
+          {event.eventDate && (
+            <p className="text-sm text-muted-foreground">
+              <b>Event Date:</b> {event.eventDate}
+            </p>
+          )}
         </div>
-
         <div className="flex items-center gap-3">
           <div
             className={cn(
@@ -46,16 +73,20 @@ export function EventRequestCard({ event }: { event: EventData }) {
           >
             {event.status}
           </div>
-          <ChevronDown
-            className={cn(
-              "h-5 w-5 text-muted-foreground transition-transform duration-300",
-              open && "rotate-180"
-            )}
-          />
+          {/* Accordion button only if showAccordion is true */}
+          {showAccordion && (
+            <ChevronDown
+              className={cn(
+                "h-5 w-5 text-muted-foreground transition-transform duration-300",
+                open && "rotate-180"
+              )}
+            />
+          )}
         </div>
       </div>
 
-      {open && (
+      {/* Accordion content */}
+      {showAccordion && open && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
           {/* Shared info */}
           <div className="space-y-2">
