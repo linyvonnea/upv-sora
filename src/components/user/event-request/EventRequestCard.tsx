@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { ChevronDown } from "lucide-react"
-import { useState } from "react"
-import { ProgressTracker } from "./ProgressTracker"
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ProgressTracker } from "./ProgressTracker";
 
 export interface EventData {
-  id: number
-  title: string
-  requestDate: string
-  status: string
+  id: number;
+  title: string;
+  requestDate: string;
+  status: string;
 }
 
 export function EventRequestCard({ event }: { event: EventData }) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Map status to background/text color
   const statusColors: Record<string, string> = {
@@ -22,16 +22,13 @@ export function EventRequestCard({ event }: { event: EventData }) {
     "Under Evaluation": "bg-blue-100 text-blue-800",
     "Forwarded to Offices": "bg-purple-100 text-purple-800",
     "Issues Found": "bg-red-100 text-red-800",
-    "Approved": "bg-green-100 text-green-800",
-    "Disapproved": "bg-gray-100 text-gray-800",
-  }
+    Approved: "bg-green-100 text-green-800",
+    Disapproved: "bg-gray-100 text-gray-800",
+  };
 
   return (
     <div
-      className={cn(
-        "border rounded-lg p-4 cursor-pointer transition",
-        open && "bg-muted/40"
-      )}
+      className={cn("border rounded-lg p-4 cursor-pointer transition", open && "bg-muted/40")}
       onClick={() => setOpen((prev) => !prev)}
     >
       <div className="flex justify-between items-center">
@@ -62,13 +59,34 @@ export function EventRequestCard({ event }: { event: EventData }) {
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
           {/* Shared info */}
           <div className="space-y-2">
-            <p><b>Event Date:</b> April 25, 2025</p>
-            <p><b>Event Type:</b> Online</p>
-            <p><b>Submitted Requirements:</b></p>
+            <p>
+              <b>Event Date:</b> April 25, 2025
+            </p>
+            <p>
+              <b>Event Type:</b> Online
+            </p>
+            <p>
+              <b>Submitted Requirements:</b>
+            </p>
             <ul className="pl-4 list-disc">
-              <li><b>Request Letter:</b> <a href="#" className="text-blue-600 underline">Request Letter.pdf</a></li>
-              <li><b>Conforme Letter:</b> <a href="#" className="text-blue-600 underline">Signed Conforme.pdf</a></li>
-              <li><b>Details of Activity:</b> <a href="#" className="text-blue-600 underline">https://drive.google.com/...</a></li>
+              <li>
+                <b>Request Letter:</b>{" "}
+                <a href="#" className="text-blue-600 underline">
+                  Request Letter.pdf
+                </a>
+              </li>
+              <li>
+                <b>Conforme Letter:</b>{" "}
+                <a href="#" className="text-blue-600 underline">
+                  Signed Conforme.pdf
+                </a>
+              </li>
+              <li>
+                <b>Details of Activity:</b>{" "}
+                <a href="#" className="text-blue-600 underline">
+                  https://drive.google.com/...
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -84,7 +102,7 @@ export function EventRequestCard({ event }: { event: EventData }) {
               <p>Your request is currently under review. Please wait for updates.</p>
             )}
             {event.status === "Forwarded to Offices" && (
-            <div>
+              <div>
                 <p className="font-semibold mb-2">Progress Tracker</p>
                 <ProgressTracker
                   steps={[
@@ -109,21 +127,31 @@ export function EventRequestCard({ event }: { event: EventData }) {
               <>
                 <p className="mb-2">Your request is approved.</p>
                 <p className="italic text-muted-foreground mb-4">Admin feedback: Great job!</p>
-                <p><b>Download NOA:</b></p>
-                <a className="text-blue-600 underline" href="#">NOA.pdf</a>
+                <p>
+                  <b>Download NOA:</b>
+                </p>
+                <a className="text-blue-600 underline" href="#">
+                  NOA.pdf
+                </a>
               </>
             )}
             {event.status === "Disapproved" && (
               <>
                 <p className="mb-2">Your request has been rejected.</p>
-                <p className="italic text-muted-foreground mb-4">Reason: Missing advisor signature.</p>
-                <p><b>Download NOA:</b></p>
-                <a className="text-blue-600 underline" href="#">NOA.pdf</a>
+                <p className="italic text-muted-foreground mb-4">
+                  Reason: Missing advisor signature.
+                </p>
+                <p>
+                  <b>Download NOA:</b>
+                </p>
+                <a className="text-blue-600 underline" href="#">
+                  NOA.pdf
+                </a>
               </>
             )}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
