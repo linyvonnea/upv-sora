@@ -94,12 +94,20 @@ export function EventRequestCard({ event }: { event: EventData }) {
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
-                <p className="mb-4">Your request is awaiting evaluation by SOA.</p>
+                <div className="max-w-xs">
+                  <p className="mb-4 break-words whitespace-normal w-full">
+                    Your request has been submitted and is waiting to be reviewed by the appropriate
+                    staff.
+                  </p>
+                </div>
                 <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
               </>
             )}
             {event.status === "Under Evaluation" && (
-              <p>Your request is currently under review. Please wait for updates.</p>
+              <div>
+                <p>Your request is undergoing detailed evaluation procedure.</p>
+                <p>No action needed at this time.</p>
+              </div>
             )}
             {event.status === "Forwarded to Offices" && (
               <div>
