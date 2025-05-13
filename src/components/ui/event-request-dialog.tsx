@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import DragFileUpload from "@/components/ui/drag-file-upload";
-import FileUploadForm from "@/components/ui/file-upload-form"; 
+import FileUploadForm from "@/components/ui/file-upload-form";
+import { toast } from "sonner"; // Add this import at the top
 
 export function EventRequestDialog({
   open,
@@ -25,10 +26,20 @@ export function EventRequestDialog({
 }) {
   const [step, setStep] = React.useState(1);
   const [eventName, setEventName] = React.useState("");
+  const [eventDate, setEventDate] = React.useState<Date | undefined>(undefined);
   const [modality, setModality] = React.useState("Online");
 
   const handleNext = () => {
     if (step === 1) {
+      const missing: string[] = [];
+      if (!eventName.trim()) missing.push("Name");
+      if (!eventDate) missing.push("Date of Event");
+      if (!modality) missing.push("Modality");
+
+      if (missing.length > 0) {
+        toast.error(`Please fill in the following required field(s): ${missing.join(", ")}`);
+        return;
+      }
       setStep(2);
     } else {
       // Submit logic
@@ -110,11 +121,12 @@ export function EventRequestDialog({
                 placeholder="Event Name"
                 value={eventName}
                 onChange={(e) => setEventName(e.target.value)}
+                required
               />
             </div>
 
             <div className="mb-2">
-              <DatePicker />
+              <DatePicker selected={eventDate} onSelect={setEventDate} />
             </div>
 
             <div className="mb-8">

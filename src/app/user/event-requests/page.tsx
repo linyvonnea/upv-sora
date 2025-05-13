@@ -7,12 +7,13 @@ import { EventRequestTabs } from "@/components/user/event-request/EventRequestTa
 import { EventRequestCard, EventData } from "@/components/user/event-request/EventRequestCard";
 import SortModal from "@/components/ui/SortModal";
 import { FilterModal } from "@/components/ui/filter-modal";
+import { SearchBar } from "@/components/ui/search-bar";
 
 const mockEvents: EventData[] = [
   {
     id: 1,
     status: "Awaiting Evaluation",
-    title: "Event Title",
+    title: "Event1",
     requestDate: "April 1, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -21,7 +22,7 @@ const mockEvents: EventData[] = [
   {
     id: 2,
     status: "Under Evaluation",
-    title: "Event Title",
+    title: "Event2",
     requestDate: "April 2, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -30,7 +31,7 @@ const mockEvents: EventData[] = [
   {
     id: 3,
     status: "Forwarded to Offices",
-    title: "Event Title",
+    title: "Event3",
     requestDate: "April 3, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -39,7 +40,7 @@ const mockEvents: EventData[] = [
   {
     id: 4,
     status: "Issues Found",
-    title: "Event Title",
+    title: "Event4",
     requestDate: "April 4, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -48,7 +49,7 @@ const mockEvents: EventData[] = [
   {
     id: 5,
     status: "Approved",
-    title: "Event Title",
+    title: "Event5",
     requestDate: "April 5, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -57,7 +58,7 @@ const mockEvents: EventData[] = [
   {
     id: 6,
     status: "Disapproved",
-    title: "Event Title",
+    title: "Event6",
     requestDate: "April 6, 2025",
     modality: "Online",
     location: "Iloilo",
@@ -74,6 +75,12 @@ const statusOptions = [
   "Disapproved",
 ];
 
+type FilterOptions = {
+  search: string;
+  modality: "" | "Online" | "On-Site";
+  location: "" | "Iloilo" | "Miagao";
+};
+
 export default function EventRequestPage() {
   const [activeTab, setActiveTab] = useState("All");
   const [isSortModalOpen, setSortModalOpen] = useState(false);
@@ -82,25 +89,14 @@ export default function EventRequestPage() {
     order: "Latest",
   });
   const [isFilterOpen, setFilterOpen] = useState(false);
-  const [filters, setFilters] = useState<{
-    organizationName: string;
-    status: string;
-    modality: "" | "Online" | "On-Site";
-    location: "" | "Iloilo" | "Miagao";
-  }>({
-    organizationName: "",
-    status: "",
+  const [filters, setFilters] = useState<FilterOptions>({
+    search: "",
     modality: "",
     location: "",
   });
 
-  const filteredEvents = mockEvents.filter(
-    (event) =>
-      (!filters.organizationName ||
-        event.organizationName?.toLowerCase().includes(filters.organizationName.toLowerCase())) &&
-      (!filters.status || event.status === filters.status) &&
-      (!filters.modality || event.modality === filters.modality) &&
-      (!filters.location || event.location === filters.location)
+  const filteredEvents = mockEvents.filter((event) =>
+    event.title.toLowerCase().includes(filters.search.toLowerCase())
   );
 
   const tabFilteredEvents =
@@ -121,6 +117,14 @@ export default function EventRequestPage() {
     <div className="p-10">
       <h1 className="text-3xl font-bold mb-6">Event Requests History</h1>
       <div className="flex items-center gap-4 mb-6 w-full max-w-[1000px]">
+        <div className="flex-1">
+          <SearchBar
+            value={filters.search}
+            onChange={(val) => setFilters((f) => ({ ...f, search: val }))}
+            placeholder="Search by Event Request Title"
+            label="Request Title"
+          />
+        </div>
         <Button
           variant="outline"
           className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
@@ -136,10 +140,10 @@ export default function EventRequestPage() {
           Sort By <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </div>
-      <div className="m-4">
+
+      <div className="m-4 ">
         <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-
       <div className="space-y-4 w-[1000px]">
         {sortedEvents.map((event) => (
           <EventRequestCard key={event.id} event={event} />
@@ -154,10 +158,10 @@ export default function EventRequestPage() {
       <FilterModal
         isOpen={isFilterOpen}
         onClose={() => setFilterOpen(false)}
-        onApply={() => setFilterOpen(false)}
+        onApply={(newFilters) => setFilters(newFilters)}
         filters={filters}
         setFilters={setFilters}
-        statusOptions={statusOptions}
+        mode="user"
       />
     </div>
   );

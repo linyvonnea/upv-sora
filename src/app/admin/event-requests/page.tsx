@@ -7,11 +7,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import SortModal from "@/components/ui/SortModal";
 import { FilterModal } from "@/components/ui/filter-modal";
+import { EventRequestTabs } from "@/components/user/event-request/EventRequestTabs";
+
+type FilterOptions = {
+  search: string;
+  modality: "" | "Online" | "On-Site";
+  location: "" | "Iloilo" | "Miagao";
+};
 
 const adminEvents: EventData[] = [
   {
     id: 1,
-    title: "EVENT TITLE",
+    title: "Event1",
     requestDate: "April 1, 2025",
     eventDate: "April 10, 2025",
     status: "Awaiting Evaluation",
@@ -21,7 +28,7 @@ const adminEvents: EventData[] = [
   },
   {
     id: 2,
-    title: "EVENT TITLE",
+    title: "Event2",
     requestDate: "April 5, 2025",
     eventDate: "April 15, 2025",
     status: "Issues Found",
@@ -31,7 +38,7 @@ const adminEvents: EventData[] = [
   },
   {
     id: 3,
-    title: "EVENT TITLE",
+    title: "Event3",
     requestDate: "April 20, 2025",
     eventDate: "April 25, 2025",
     status: "Disapproved",
@@ -52,7 +59,6 @@ const statusOptions = [
 ];
 
 export default function AdminEventRequestsPage() {
-  const [search, setSearch] = React.useState("");
   const [isSortModalOpen, setSortModalOpen] = React.useState(false);
   const [sortOption, setSortOption] = React.useState<{
     type: string;
@@ -63,29 +69,28 @@ export default function AdminEventRequestsPage() {
     order: "Latest",
   });
   const [isFilterOpen, setFilterOpen] = React.useState(false);
-  const [filters, setFilters] = React.useState<{
-    organizationName: string;
-    status: string;
-    modality: "" | "Online" | "On-Site";
-    location: "" | "Iloilo" | "Miagao";
-  }>({
-    organizationName: "",
-    status: "",
+  const [filters, setFilters] = React.useState<FilterOptions>({
+    search: "",
     modality: "",
     location: "",
   });
+  const [activeTab, setActiveTab] = React.useState("All");
 
+  // Filtering logic
   const filteredEvents = adminEvents.filter(
     (event) =>
-      (!filters.organizationName ||
-        event.organizationName?.toLowerCase().includes(filters.organizationName.toLowerCase())) &&
-      (!filters.status || event.status === filters.status) &&
+      [event.organizationName, event.title].some((field) =>
+        field?.toLowerCase().includes(filters.search.toLowerCase())
+      ) &&
       (!filters.modality || event.modality === filters.modality) &&
       (!filters.location || event.location === filters.location)
   );
 
+  const tabFilteredEvents =
+    activeTab === "All" ? filteredEvents : filteredEvents.filter((e) => e.status === activeTab);
+
   // Sorting logic (same as user side)
-  const sortedEvents = [...filteredEvents].sort((a, b) => {
+  const sortedEvents = [...tabFilteredEvents].sort((a, b) => {
     if (sortOption.type === "Request Date") {
       const dateA = new Date(a.requestDate);
       const dateB = new Date(b.requestDate);
@@ -102,7 +107,12 @@ export default function AdminEventRequestsPage() {
       <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
       <div className="flex items-center gap-4 mb-6 w-full max-w-[1000px]">
         <div className="max-w-3xl w-full">
-          <SearchBar value={search} onChange={setSearch} />
+          <SearchBar
+            value={filters.search}
+            onChange={(val) => setFilters((f) => ({ ...f, search: val }))}
+            placeholder="Search by Organization or Event Request"
+            label="Organization/Request Title"
+          />
         </div>
         <Button
           variant="outline"
@@ -119,6 +129,7 @@ export default function AdminEventRequestsPage() {
           Sort By <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </div>
+      <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="flex flex-col items-center">
         <div className="space-y-4 w-[1000px]">
           {sortedEvents.map((event) => (
@@ -134,10 +145,10 @@ export default function AdminEventRequestsPage() {
       <FilterModal
         isOpen={isFilterOpen}
         onClose={() => setFilterOpen(false)}
-        onApply={() => setFilterOpen(false)}
+        onApply={(newFilters) => setFilters(newFilters)}
         filters={filters}
         setFilters={setFilters}
-        statusOptions={statusOptions}
+        mode="admin"
       />
     </div>
   );

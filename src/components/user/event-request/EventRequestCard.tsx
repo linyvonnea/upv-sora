@@ -35,6 +35,9 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
     Disapproved: "bg-gray-100 text-gray-800",
   };
 
+  // Detect if this is the admin side by checking for showAccordion === false
+  const isAdmin = showAccordion === false;
+
   return (
     <div
       className={cn(
@@ -46,8 +49,8 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
     >
       <div className="flex justify-between items-center">
         <div>
-          {/* Organization Name on top */}
-          {event.organizationName && (
+          {/* Organization Name on top (Admin Side only) */}
+          {isAdmin && event.organizationName && (
             <div className="mb-1">
               <span className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-medium">
                 {event.organizationName}
