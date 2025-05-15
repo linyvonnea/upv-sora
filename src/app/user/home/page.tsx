@@ -10,10 +10,9 @@ export default function UserHomePage() {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <EventRequestDialog open={open} setOpen={setOpen} />
-    </div> 
+    </div>
   );
 }
-
 
 // revamped, calendar still not working tho
 // "use client";
