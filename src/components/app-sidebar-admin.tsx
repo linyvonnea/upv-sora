@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Calendar, Image, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Calendar, Image as LucideImage, LogOut, Settings, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,19 +18,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 export function AppSidebarAdmin() {
   const pathname = usePathname();
 
   const adminLinks = [
     { label: "Event Requests", href: "/admin/event-requests", icon: Calendar },
-    { label: "Pubmat Requests", href: "/admin/pubmat-requests", icon: Image },
+    { label: "Pubmat Requests", href: "/admin/pubmat-requests", icon: LucideImage },
   ];
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="text-lg font-bold pl-4">UPV-SORA (Admin)</div>
+        <div className="inline-flex items-center gap-2 text-lg font-bold">
+          <Image src="/images/logo_green.png" alt="UPV Sora Logo" width={45} height={45} />
+          UPV-SORA (Admin)
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
