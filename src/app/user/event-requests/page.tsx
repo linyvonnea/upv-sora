@@ -15,8 +15,8 @@ const mockEvents: EventData[] = [
     status: "Awaiting Evaluation",
     title: "Event1",
     requestDate: "April 1, 2025",
+    eventDate: "April 18, 2025",
     modality: "Online",
-    location: "Iloilo",
     organizationName: "Org 1",
   },
   {
@@ -24,8 +24,8 @@ const mockEvents: EventData[] = [
     status: "Under Evaluation",
     title: "Event2",
     requestDate: "April 2, 2025",
+    eventDate: "April 20, 2025",
     modality: "Online",
-    location: "Iloilo",
     organizationName: "Org 2",
   },
   {
@@ -33,8 +33,8 @@ const mockEvents: EventData[] = [
     status: "Forwarded to Offices",
     title: "Event3",
     requestDate: "April 3, 2025",
+    eventDate: "April 21, 2025",
     modality: "Online",
-    location: "Iloilo",
     organizationName: "Org 3",
   },
   {
@@ -42,8 +42,9 @@ const mockEvents: EventData[] = [
     status: "Issues Found",
     title: "Event4",
     requestDate: "April 4, 2025",
+    eventDate: "April 25, 2025",
     modality: "Online",
-    location: "Iloilo",
+
     organizationName: "Org 4",
   },
   {
@@ -51,8 +52,8 @@ const mockEvents: EventData[] = [
     status: "Approved",
     title: "Event5",
     requestDate: "April 5, 2025",
+    eventDate: "April 27, 2025",
     modality: "Online",
-    location: "Iloilo",
     organizationName: "Org 5",
   },
   {
@@ -60,8 +61,9 @@ const mockEvents: EventData[] = [
     status: "Disapproved",
     title: "Event6",
     requestDate: "April 6, 2025",
+    eventDate: "April 30, 2025",
     modality: "Online",
-    location: "Iloilo",
+
     organizationName: "Org 6",
   },
 ];
@@ -95,8 +97,11 @@ export default function EventRequestPage() {
     location: "",
   });
 
-  const filteredEvents = mockEvents.filter((event) =>
-    event.title.toLowerCase().includes(filters.search.toLowerCase())
+  const filteredEvents = mockEvents.filter(
+    (event) =>
+      event.title.toLowerCase().includes(filters.search.toLowerCase()) &&
+      (filters.modality === "" || event.modality === filters.modality) &&
+      (filters.location === "" || event.location === filters.location)
   );
 
   const tabFilteredEvents =

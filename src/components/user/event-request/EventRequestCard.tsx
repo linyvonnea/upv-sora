@@ -5,12 +5,13 @@ import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { ProgressTracker } from "./ProgressTracker";
+import { EventDetails } from "@/components/left-event-details";
 
 export interface EventData {
   id: number;
   title: string;
   requestDate: string;
-  eventDate?: string;
+  eventDate: string;
   status: string;
   organizationName?: string;
   modality?: "Online" | "On-Site";
@@ -93,47 +94,27 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
           {/* Shared info */}
           <div className="space-y-2">
-            <p>
-              <b>Event Date:</b> April 25, 2025
-            </p>
-            <p>
-              <b>Event Type:</b> Online
-            </p>
-            <p>
-              <b>Submitted Requirements:</b>
-            </p>
-            <ul className="pl-4 list-disc">
-              <li>
-                <b>Request Letter:</b>{" "}
-                <a href="#" className="text-blue-600 underline">
-                  Request Letter.pdf
-                </a>
-              </li>
-              <li>
-                <b>Conforme Letter:</b>{" "}
-                <a href="#" className="text-blue-600 underline">
-                  Signed Conforme.pdf
-                </a>
-              </li>
-              <li>
-                <b>Details of Activity:</b>{" "}
-                <a href="#" className="text-blue-600 underline">
-                  https://drive.google.com/...
-                </a>
-              </li>
-            </ul>
+            <EventDetails event={event} />
           </div>
 
           {/* Status-based display */}
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
-                <p className="mb-4">Your request is awaiting evaluation by SOA.</p>
-                <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+                <p className="font-bold text-center mb-4">
+                  Your request has been submitted and is waiting to be reviewed by the appropriate
+                  staff
+                </p>
+                <div className="flex justify-center">
+                  <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+                </div>
               </>
             )}
             {event.status === "Under Evaluation" && (
-              <p>Your request is currently under review. Please wait for updates.</p>
+              <p className="font-bold text-center mb-4">
+                Your request is undergoing detailed evaluation procedure. No action needed at this
+                time.
+              </p>
             )}
             {event.status === "Forwarded to Offices" && (
               <div>
@@ -149,7 +130,7 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
             )}
             {event.status === "Issues Found" && (
               <>
-                <p className="mb-2">Issues found in your request:</p>
+                <p className="font-bold mb-2">Issues found in your request:</p>
                 <ul className="list-disc ml-6 mb-4">
                   <li>Issue 1</li>
                   <li>Issue 2</li>
@@ -159,7 +140,9 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
             )}
             {event.status === "Approved" && (
               <>
-                <p className="mb-2">Your request is approved.</p>
+                <p className="font-semibold mb-2">
+                  Your request has met all requirements and is officially approved.{" "}
+                </p>
                 <p className="italic text-muted-foreground mb-4">Admin feedback: Great job!</p>
                 <p>
                   <b>Download NOA:</b>
@@ -171,7 +154,10 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
             )}
             {event.status === "Disapproved" && (
               <>
-                <p className="mb-2">Your request has been rejected.</p>
+                <p className="font-semibold mb-2">
+                  Unfortunately, your request has been rejected. You may review the feedback and
+                  reapply
+                </p>
                 <p className="italic text-muted-foreground mb-4">
                   Reason: Missing advisor signature.
                 </p>

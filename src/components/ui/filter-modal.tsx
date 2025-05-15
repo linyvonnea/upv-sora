@@ -2,7 +2,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import { X } from "lucide-react"; 
+import { X } from "lucide-react";
 
 interface FilterOptions {
   search: string; // Now used for both org name and title

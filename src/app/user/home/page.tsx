@@ -15,7 +15,7 @@ export default function UserHomePage() {
 }
 
 
-// revamped, calnedar still not working tho
+// revamped, calendar still not working tho
 // "use client";
 
 // import { useState } from "react";

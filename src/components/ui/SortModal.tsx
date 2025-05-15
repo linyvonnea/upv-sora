@@ -84,7 +84,7 @@ export default function SortModal({ isOpen, onClose, onApply }: SortModalProps) 
           </Button>
           <Button
             variant="default"
-            className="bg-blue-500 text-white hover:bg-blue-600"
+            className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
             onClick={handleApply}
           >
             Apply

@@ -152,6 +152,17 @@ export function EventRequestDialog({
         )}
         {step === 2 && (
           <div className="space-y-4">
+            <div className="mb-4">
+              <span className="font-medium">Download Requirement Forms here: </span>
+              <a
+                href="https://drive.google.com/drive/folders/19_zBtUBtKYIaxL-V9b1BLRf6462zn-_u"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                Google Drive Link
+              </a>
+            </div>
             {requiredDocuments[modality as keyof typeof requiredDocuments].map((doc) => (
               <UploadSection key={doc} title={doc} />
             ))}
