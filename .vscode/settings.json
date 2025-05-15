@@ -2,5 +2,5 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "prettier.requireConfig": true,
-  "cSpell.words": ["pubmats"]
+  "cSpell.words": ["Conforme", "Pubmat", "pubmats"]
 }
