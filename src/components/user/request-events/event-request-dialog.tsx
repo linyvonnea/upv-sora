@@ -37,9 +37,6 @@ export function EventRequestDialog({
 
   function handleSubmitFinalForm() {
     setStep(3);
-    toast.success("Event request submitted successfully!", {
-      description: "Your event request has been received and is being processed.",
-    });
   }
 
   function handleClose() {
