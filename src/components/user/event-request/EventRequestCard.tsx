@@ -101,20 +101,21 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
-                <p className="font-bold text-center mb-4">
-                  Your request has been submitted and is waiting to be reviewed by the appropriate
-                  staff
-                </p>
-                <div className="flex justify-center">
-                  <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+
+                <div className="max-w-xs">
+                  <p className="mb-4 break-words whitespace-normal w-full">
+                    Your request has been submitted and is waiting to be reviewed by the appropriate
+                    staff.
+                  </p>
                 </div>
+                <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
               </>
             )}
             {event.status === "Under Evaluation" && (
-              <p className="font-bold text-center mb-4">
-                Your request is undergoing detailed evaluation procedure. No action needed at this
-                time.
-              </p>
+              <div>
+                <p>Your request is undergoing detailed evaluation procedure.</p>
+                <p>No action needed at this time.</p>
+              </div>
             )}
             {event.status === "Forwarded to Offices" && (
               <div>

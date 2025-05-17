@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { EventRequestStep1 } from "./EventRequestStep1";
 import { EventRequestStep2 } from "./EventRequestStep2";
 import { EventRequestSuccess } from "./EventRequestSuccess";
+import { toast } from "sonner";
 
 type EventType = "on-campus" | "online" | "off-campus" | null;
 
