@@ -1,32 +1,27 @@
+// components/user/event-request/EventRequestCard.tsx
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { ProgressTracker } from "./ProgressTracker";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, Pencil } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { EventRequestDialog } from "@/components/ui/event-request-dialog";
+import { EventRequest } from "@/types/event-request";
+import { ProgressTracker } from "@/components/user/event-request/ProgressTracker";
 import { EventDetails } from "@/components/left-event-details";
 
-export interface EventData {
-  id: number;
-  title: string;
-  requestDate: string;
-  eventDate: string;
-  status: string;
-  organizationName?: string;
-  modality?: "Online" | "On-Site";
-  location?: "Iloilo" | "Miagao";
-}
-
-interface EventRequestCardProps {
-  event: EventData;
+export function EventRequestCard({
+  event,
+  showAccordion = true,
+  onEdit,
+}: {
+  event: EventRequest;
   showAccordion?: boolean;
-}
-
-export function EventRequestCard({ event, showAccordion = true }: EventRequestCardProps) {
+  onEdit?: (event: EventRequest) => void;
+}) {
   const [open, setOpen] = useState(false);
+  const isAdmin = showAccordion === false;
 
-  // Map status to background/text color
   const statusColors: Record<string, string> = {
     "Awaiting Evaluation": "bg-yellow-100 text-yellow-800",
     "Under Evaluation": "bg-blue-100 text-blue-800",
@@ -35,9 +30,6 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
     Approved: "bg-green-100 text-green-800",
     Disapproved: "bg-gray-100 text-gray-800",
   };
-
-  // Detect if this is the admin side by checking for showAccordion === false
-  const isAdmin = showAccordion === false;
 
   return (
     <div
@@ -50,8 +42,7 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
     >
       <div className="flex justify-between items-center">
         <div>
-          {/* Organization Name on top (Admin Side only) */}
-          {isAdmin && event.organizationName && (
+          {!showAccordion && event.organizationName && (
             <div className="mb-1">
               <span className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-medium">
                 {event.organizationName}
@@ -77,7 +68,6 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
           >
             {event.status}
           </div>
-          {/* Accordion button only if showAccordion is true */}
           {showAccordion && (
             <ChevronDown
               className={cn(
@@ -89,33 +79,30 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
         </div>
       </div>
 
-      {/* Accordion content */}
       {showAccordion && open && (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
-          {/* Shared info */}
           <div className="space-y-2">
             <EventDetails event={event} />
           </div>
 
-          {/* Status-based display */}
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
-                <div className="max-w-xs">
-                  <p className="mb-4 break-words whitespace-normal w-full">
-                    Your request has been submitted and is waiting to be reviewed by the appropriate
-                    staff.
-                  </p>
-                </div>
-                <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+                <p className="mb-4 text-muted-foreground">
+                  Your request has been submitted and is waiting to be reviewed.
+                </p>
+                <Button
+                  className="bg-[#284b3e] hover:bg-[#284b3e]/90"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(event);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Request
+                </Button>
               </>
             )}
-            {event.status === "Under Evaluation" && (
-              <div>
-                <p>Your request is undergoing detailed evaluation procedure.</p>
-                <p>No action needed at this time.</p>
-              </div>
-            )}
+            {event.status === "Under Evaluation" && <p>No action needed at this time.</p>}
             {event.status === "Forwarded to Offices" && (
               <div>
                 <p className="font-semibold mb-2">Progress Tracker</p>
@@ -132,34 +119,25 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
               <>
                 <p className="font-bold mb-2">Issues found in your request:</p>
                 <ul className="list-disc ml-6 mb-4">
-                  <li>Issue 1</li>
-                  <li>Issue 2</li>
+                  {(event.issues || []).map((issue, idx) => (
+                    <li key={idx}>{issue}</li>
+                  ))}
                 </ul>
-                <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+                <Button
+                  className="bg-[#284b3e] hover:bg-[#284b3e]/90"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(event);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Request
+                </Button>
               </>
             )}
-            {event.status === "Approved" && (
+            {(event.status === "Approved" || event.status === "Disapproved") && (
               <>
-                <p className="font-semibold mb-2">
-                  Your request has met all requirements and is officially approved.{" "}
-                </p>
-                <p className="italic text-muted-foreground mb-4">Admin feedback: Great job!</p>
-                <p>
-                  <b>Download NOA:</b>
-                </p>
-                <a className="text-blue-600 underline" href="#">
-                  NOA.pdf
-                </a>
-              </>
-            )}
-            {event.status === "Disapproved" && (
-              <>
-                <p className="font-semibold mb-2">
-                  Unfortunately, your request has been rejected. You may review the feedback and
-                  reapply
-                </p>
                 <p className="italic text-muted-foreground mb-4">
-                  Reason: Missing advisor signature.
+                  Admin feedback: {event.comment || "-"}
                 </p>
                 <p>
                   <b>Download NOA:</b>
