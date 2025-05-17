@@ -10,7 +10,7 @@ export default function UserHomePage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <EventRequestDialog open={open} setOpen={setOpen} />
+      <EventRequestDialog open={openDialog} setOpen={setOpenDialog} />
     </div>
   );
 }
