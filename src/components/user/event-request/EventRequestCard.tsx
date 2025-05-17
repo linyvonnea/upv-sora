@@ -101,7 +101,6 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
-
                 <div className="max-w-xs">
                   <p className="mb-4 break-words whitespace-normal w-full">
                     Your request has been submitted and is waiting to be reviewed by the appropriate
