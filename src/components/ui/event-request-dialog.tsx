@@ -17,12 +17,11 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import DragFileUpload from "@/components/ui/drag-file-upload";
-import FileUploadForm from "@/components/ui/file-upload-form";
 import { toast } from "sonner";
 import { EventRequestDialogProps } from "@/types/event-request";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventRequestSuccess } from "@/components/user/event-request/EventRequestSuccess";
+import { FilePondUploader } from "@/components/ui/filepond-uploader";
 
 export function EventRequestDialog({
   open,
@@ -39,17 +38,35 @@ export function EventRequestDialog({
   const [eventDate, setEventDate] = React.useState<Date | undefined>(undefined);
   const [modality, setModality] = React.useState<"Online" | "On Campus" | "Off Campus">("Online");
   const [showSuccess, setShowSuccess] = React.useState(false);
+  const [uploadedFiles, setUploadedFiles] = React.useState<
+    Record<string, { url: string; size: number }>
+    >({});
 
   React.useEffect(() => {
     if (initialData && open) {
       setEventName(initialData.title || "");
-      setEventDate(
-        initialData.eventDate ? new Date(initialData.eventDate + "T00:00") : undefined
-      );
+      setEventDate(initialData.eventDate ? new Date(initialData.eventDate + "T00:00") : undefined);
       setModality((initialData.modality as any) || "Online");
+
+      if (initialData.files) {
+        const upgradedFiles: Record<string, { url: string; size: number }> = {};
+
+        for (const [label, value] of Object.entries(initialData.files)) {
+          if (typeof value === "string") {
+            // old format, string only
+            upgradedFiles[label] = { url: value, size: 0 };
+          } else if (typeof value === "object" && "url" in value) {
+            // already in new format
+            upgradedFiles[label] = value as { url: string; size: number };
+          }
+        }
+
+        setUploadedFiles(upgradedFiles);
+      } else {
+        setUploadedFiles({});
+      }
     }
   }, [initialData, open]);
-
   const handleNext = async () => {
     if (step === 1) {
       const missing: string[] = [];
@@ -76,11 +93,17 @@ export function EventRequestDialog({
           return;
         }
         try {
-          await updateDoc(doc(db, "eventRequests", initialData.id), {
-            title: eventName,
-            eventDate: eventDateStr,
-            modality,
-          });
+        // Remove any empty uploads before saving
+        const cleanedFiles = Object.fromEntries(
+          Object.entries(uploadedFiles).filter(([_, value]) => value.url)
+        );
+
+        await updateDoc(doc(db, "eventRequests", initialData.id), {
+          title: eventName,
+          eventDate: eventDateStr,
+          modality,
+          files: cleanedFiles,
+        });
           toast.success("Request updated successfully!");
           setOpen(false);
           setStep(1);
@@ -103,6 +126,7 @@ export function EventRequestDialog({
             organizationId: user.uid,
             organizationName: user.email,
             status: "Awaiting Evaluation",
+            files: uploadedFiles,
             createdAt: serverTimestamp(),
           });
 
@@ -111,6 +135,7 @@ export function EventRequestDialog({
           setEventName("");
           setEventDate(undefined);
           setModality("Online");
+          setUploadedFiles({});
         } catch (err) {
           console.error(err);
           toast.error("Failed to submit request.");
@@ -150,17 +175,25 @@ export function EventRequestDialog({
     ],
   };
 
-  const keyDocuments = [
-    "Request Letter",
-    "Signed Conforme of Adviser",
-    "Details of Activity",
-    "Letter of Partnership",
-  ];
-
   const UploadSection = ({ title }: { title: string }) => (
     <div className="mb-4">
-      <Label className="block mb-1">{title}</Label>
-      {keyDocuments.includes(title) ? <DragFileUpload /> : <FileUploadForm />}
+      <Label className="block mb-1" htmlFor={title}>{title}</Label>
+      <FilePondUploader
+        initialUrl={uploadedFiles[title]?.url}
+        onUpload={({ url, size }) =>
+          setUploadedFiles((prev) => ({
+            ...prev,
+            [title]: { url, size },
+          }))
+        }
+        onRemove={() =>
+          setUploadedFiles((prev) => {
+            const updated = { ...prev };
+            delete updated[title];
+            return updated;
+          })
+        }
+      />
     </div>
   );
 
@@ -213,9 +246,15 @@ export function EventRequestDialog({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-full">
-                      <DropdownMenuItem onSelect={() => setModality("Online")}>Online</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => setModality("On Campus")}>On Campus</DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => setModality("Off Campus")}>Off Campus</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setModality("Online")}>
+                        Online
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setModality("On Campus")}>
+                        On Campus
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setModality("Off Campus")}>
+                        Off Campus
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

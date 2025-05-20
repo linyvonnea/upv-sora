@@ -1,14 +1,14 @@
-// components/user/event-request/EventRequestCard.tsx
+// components/ui/user/event-request/EventRequestCard.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Pencil } from "lucide-react";
+import { ChevronDown, Download, Eye, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EventRequestDialog } from "@/components/ui/event-request-dialog";
 import { EventRequest } from "@/types/event-request";
 import { ProgressTracker } from "@/components/user/event-request/ProgressTracker";
-import { EventDetails } from "@/components/left-event-details";
+import { FilePreviewModal } from "@/components/ui/FilePreviewModal";
 
 export function EventRequestCard({
   event,
@@ -20,7 +20,7 @@ export function EventRequestCard({
   onEdit?: (event: EventRequest) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const isAdmin = showAccordion === false;
+  const [previewFile, setPreviewFile] = useState<{ url: string; label: string } | null>(null);
 
   const statusColors: Record<string, string> = {
     "Awaiting Evaluation": "bg-yellow-100 text-yellow-800",
@@ -31,34 +31,30 @@ export function EventRequestCard({
     Disapproved: "bg-gray-100 text-gray-800",
   };
 
+  const fileEntries = event.files ? Object.entries(event.files) : [];
+
   return (
     <div
       className={cn(
-        "border rounded-lg p-4 transition",
+        "border rounded-xl p-6 transition bg-white shadow-sm",
         showAccordion ? "cursor-pointer" : "",
         open && "bg-muted/40"
       )}
       onClick={showAccordion ? () => setOpen((prev) => !prev) : undefined}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start mb-4">
         <div>
-          {!showAccordion && event.organizationName && (
-            <div className="mb-1">
-              <span className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-medium">
-                {event.organizationName}
-              </span>
-            </div>
-          )}
-          <h3 className="font-bold text-lg">{event.title}</h3>
+          <h3 className="text-xl font-bold mb-1">{event.title}</h3>
           <p className="text-sm text-muted-foreground">
-            <b>Request Date:</b> {event.requestDate}
+            <span className="font-medium">Event Date:</span> {event.eventDate || "N/A"}
+            <span className="mx-2">|</span>
+            <span className="font-medium">Request Date:</span> {event.requestDate || "N/A"}
           </p>
-          {event.eventDate && (
-            <p className="text-sm text-muted-foreground">
-              <b>Event Date:</b> {event.eventDate}
-            </p>
-          )}
+          <p className="text-sm mt-1">
+            <span className="font-medium">Event Type:</span> {event.modality || "N/A"}
+          </p>
         </div>
+
         <div className="flex items-center gap-3">
           <div
             className={cn(
@@ -80,11 +76,44 @@ export function EventRequestCard({
       </div>
 
       {showAccordion && open && (
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
+        <div className="grid md:grid-cols-2 gap-6 border-t pt-6 text-sm">
+          {/* Left Side: Requirements */}
           <div className="space-y-2">
-            <EventDetails event={event} />
+            <p className="font-semibold">Submitted Requirements:</p>
+            {fileEntries.map(([label, fileObj]) => (
+              <div key={label} className="space-y-1">
+                <p className="text-muted-foreground">{label}:</p>
+                <div className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-green-700" />
+                    <a
+                      href={fileObj.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="text-sm font-medium underline"
+                    >
+                      {label}.pdf
+                    </a>
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500">
+                      {((fileObj.size || 0) / 1024).toFixed(0)} KB
+                    </span>
+                    <Eye
+                      className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewFile({ label, url: fileObj.url });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
+          {/* Right Side: Status & Action */}
           <div>
             {event.status === "Awaiting Evaluation" && (
               <>
@@ -136,19 +165,35 @@ export function EventRequestCard({
             )}
             {(event.status === "Approved" || event.status === "Disapproved") && (
               <>
-                <p className="italic text-muted-foreground mb-4">
-                  Admin feedback: {event.comment || "-"}
+                <p className="mb-2">
+                  <span className="font-semibold">Admin feedback:</span>{" "}
+                  <i className="text-muted-foreground">{event.comment || "-"}</i>
                 </p>
-                <p>
-                  <b>Download NOA:</b>
-                </p>
-                <a className="text-blue-600 underline" href="#">
-                  NOA.pdf
+                <p className="mb-1 font-medium">Download the NOA:</p>
+                <a
+                  className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200"
+                  href="#"
+                  download
+                >
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-green-700" />
+                    <span className="text-sm font-medium">NOA.pdf</span>
+                  </span>
+                  <span className="text-xs text-gray-500">200 KB</span>
                 </a>
               </>
             )}
           </div>
         </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewFile && (
+        <FilePreviewModal
+          title={previewFile.label}
+          url={previewFile.url}
+          onClose={() => setPreviewFile(null)}
+        />
       )}
     </div>
   );

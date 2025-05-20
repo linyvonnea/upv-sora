@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { EventDetails } from "@/components/left-event-details";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AdminEventStatusPanel } from "@/components/admin/update-event-request/AdminEventStatusPanel";
 import { EventRequest } from "@/types/event-request";
+import { Download, Eye } from "lucide-react";
+import { FilePreviewModal } from "@/components/ui/FilePreviewModal";
 
 const REQUIREMENTS: Record<string, string[]> = {
   Online: [
@@ -44,7 +45,8 @@ const REQUIREMENTS: Record<string, string[]> = {
 
 export default function AdminEventRequestExpandedPage() {
   const router = useRouter();
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id;
 
   const [event, setEvent] = useState<EventRequest | null>(null);
   const [checked, setChecked] = useState<string[]>([]);
@@ -52,6 +54,7 @@ export default function AdminEventRequestExpandedPage() {
   const [comment, setComment] = useState("");
   const [progress, setProgress] = useState<Record<string, boolean>>({});
   const [issues, setIssues] = useState<string[]>([]);
+  const [previewFile, setPreviewFile] = useState<{ url: string; label: string } | null>(null);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -77,6 +80,7 @@ export default function AdminEventRequestExpandedPage() {
   if (!event) return <div>Loading...</div>;
 
   const requirements = REQUIREMENTS[event.modality || "Online"] || [];
+  const fileEntries = event.files ? Object.entries(event.files) : [];
 
   const handleCheck = (req: string) => {
     setChecked((prev) => (prev.includes(req) ? prev.filter((r) => r !== req) : [...prev, req]));
@@ -87,9 +91,49 @@ export default function AdminEventRequestExpandedPage() {
   };
 
   return (
-    <div className="flex gap-8 p-8 max-w-5xl mx-auto">
-      <div className="flex-1">
-        <EventDetails event={event} />
+    <div className="flex gap-8 p-8 max-w-6xl mx-auto">
+      <div className="flex-1 space-y-4">
+        <h2 className="text-2xl font-bold">{event.title}</h2>
+        <p className="text-sm text-muted-foreground">
+          <b>Event Date:</b> {event.eventDate} | <b>Request Date:</b> {event.requestDate}
+        </p>
+        <p className="text-sm">
+          <b>Modality:</b> {event.modality}
+        </p>
+
+        <div>
+          <h3 className="font-semibold mb-2">Submitted Files</h3>
+          <div className="space-y-2">
+            {fileEntries.map(([label, file]) => (
+              <div key={label}>
+                <p className="text-muted-foreground mb-1">{label}:</p>
+                <div className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md">
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-green-700" />
+                    <a
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="text-sm font-medium underline"
+                    >
+                      {label}.pdf
+                    </a>
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500">
+                      {((file.size || 0) / 1024).toFixed(0)} KB
+                    </span>
+                    <Eye
+                      className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
+                      onClick={() => setPreviewFile({ label, url: file.url })}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 space-y-8">
@@ -123,6 +167,14 @@ export default function AdminEventRequestExpandedPage() {
           Back to List
         </Button>
       </div>
+
+      {previewFile && (
+        <FilePreviewModal
+          title={previewFile.label}
+          url={previewFile.url}
+          onClose={() => setPreviewFile(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,9 @@
-// types/event-request.ts
+// src/types/event-request.ts
+
+export interface FileData {
+  url: string;
+  size: number; // in bytes
+}
 
 export interface EventRequest {
   id: string;
@@ -12,12 +17,12 @@ export interface EventRequest {
   comment?: string;
   issues?: string[];
   progress?: Record<string, boolean>;
+  files?: Record<string, FileData>;
+  noa?: FileData; // For approved/disapproved
 }
 
-// For modal mode switching (used in EventRequestDialog)
 export type EventRequestFormMode = "new" | "edit";
 
-// Props for the EventRequestDialog component
 export interface EventRequestDialogProps {
   mode: EventRequestFormMode;
   initialData?: Partial<EventRequest>;
