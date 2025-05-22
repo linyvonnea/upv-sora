@@ -7,17 +7,15 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {
-  const { user, role, loading } = useAuth(); 
+  const { user, profile, loading } = useAuth(); // Note: profile, not role
   const router = useRouter();
 
   useEffect(() => {
-    
-    if (!loading && role !== "organization") {
-      router.push("/"); 
+    if (!loading && (!user || profile?.role !== "organization")) {
+      router.push("/");
     }
-  }, [loading, role, router]);
+  }, [loading, user, profile, router]);
 
-  
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-500">
@@ -26,8 +24,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  
-  if (role !== "organization") {
+  if (profile?.role !== "organization") {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">
         403 - Forbidden: You are not authorized to view this page.

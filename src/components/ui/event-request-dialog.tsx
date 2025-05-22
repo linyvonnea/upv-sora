@@ -3,7 +3,6 @@
 
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
-
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -40,7 +39,7 @@ export function EventRequestDialog({
   const [showSuccess, setShowSuccess] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState<
     Record<string, { url: string; size: number }>
-    >({});
+  >({});
 
   React.useEffect(() => {
     if (initialData && open) {
@@ -53,10 +52,8 @@ export function EventRequestDialog({
 
         for (const [label, value] of Object.entries(initialData.files)) {
           if (typeof value === "string") {
-            // old format, string only
             upgradedFiles[label] = { url: value, size: 0 };
           } else if (typeof value === "object" && "url" in value) {
-            // already in new format
             upgradedFiles[label] = value as { url: string; size: number };
           }
         }
@@ -67,6 +64,7 @@ export function EventRequestDialog({
       }
     }
   }, [initialData, open]);
+
   const handleNext = async () => {
     if (step === 1) {
       const missing: string[] = [];
@@ -93,17 +91,17 @@ export function EventRequestDialog({
           return;
         }
         try {
-        // Remove any empty uploads before saving
-        const cleanedFiles = Object.fromEntries(
-          Object.entries(uploadedFiles).filter(([_, value]) => value.url)
-        );
+          // Remove any empty uploads before saving
+          const cleanedFiles = Object.fromEntries(
+            Object.entries(uploadedFiles).filter(([_, value]) => value.url)
+          );
 
-        await updateDoc(doc(db, "eventRequests", initialData.id), {
-          title: eventName,
-          eventDate: eventDateStr,
-          modality,
-          files: cleanedFiles,
-        });
+          await updateDoc(doc(db, "eventRequests", initialData.id), {
+            title: eventName,
+            eventDate: eventDateStr,
+            modality,
+            files: cleanedFiles,
+          });
           toast.success("Request updated successfully!");
           setOpen(false);
           setStep(1);
@@ -123,8 +121,8 @@ export function EventRequestDialog({
             eventDate: eventDateStr,
             requestDate: new Date().toLocaleDateString("en-CA"),
             modality,
-            organizationId: user.uid,
-            organizationName: user.email,
+            organizationId: user.uid,              // Store UID
+            organizationEmail: user.email,         // Store Email for reference
             status: "Awaiting Evaluation",
             files: uploadedFiles,
             createdAt: serverTimestamp(),

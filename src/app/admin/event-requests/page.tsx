@@ -1,73 +1,123 @@
 // app/admin/event-requests/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useAdminEventRequests } from "@/hooks/useAdminEventRequests";
-import { EventRequestCard } from "@/components/user/event-request/EventRequestCard";
+import * as React from "react";
+import { EventRequest } from "@/types/event-request";
 import { SearchBar } from "@/components/ui/search-bar";
-import { FilterModal } from "@/components/ui/filter-modal";
-import SortModal from "@/components/ui/SortModal";
-import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import SortModal from "@/components/ui/SortModal";
+import { FilterModal } from "@/components/ui/filter-modal";
+import { useRouter } from "next/navigation";
+import { useAdminEventRequests } from "@/hooks/useAdminEventRequests";
+import { EventRequestTabs } from "@/components/user/event-request/EventRequestTabs";
+import { EventRequestCard } from "@/components/user/event-request/EventRequestCard";
+
+type FilterOptions = {
+  search: string;
+  modality: "" | "Online" | "On-Site";
+  location: "" | "Iloilo" | "Miagao";
+};
 
 export default function AdminEventRequestsPage() {
-  const { eventRequests, loading } = useAdminEventRequests();
-  const [search, setSearch] = useState("");
-  const [sortOpen, setSortOpen] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const { eventRequests, loading, error } = useAdminEventRequests();
+  const [isSortModalOpen, setSortModalOpen] = React.useState(false);
+  const [sortOption, setSortOption] = React.useState<{ type: string; order?: string; days?: number; }>({
+    type: "Request Date",
+    order: "Latest",
+  });
+  const [isFilterOpen, setFilterOpen] = React.useState(false);
+  const [filters, setFilters] = React.useState<FilterOptions>({
+    search: "",
+    modality: "",
+    location: "",
+  });
+  const [activeTab, setActiveTab] = React.useState("All");
+  const router = useRouter();
 
-  if (loading) return <p className="p-10">Loading event requests...</p>;
+  if (loading) return <div className="p-10 text-center">Loading event requests…</div>;
+  if (error) return <div className="p-10 text-red-600 text-center">{error}</div>;
 
-  const filtered = eventRequests.filter((event) =>
-    event.title.toLowerCase().includes(search.toLowerCase())
+  // Filtering logic
+  const filteredEvents = eventRequests.filter(
+    (event) =>
+      [event.organizationName, event.title].some((field) =>
+        field?.toLowerCase().includes(filters.search.toLowerCase())
+      ) &&
+      (!filters.modality || event.modality === filters.modality) &&
+      (!filters.location || event.location === filters.location)
   );
 
+  const tabFilteredEvents =
+    activeTab === "All" ? filteredEvents : filteredEvents.filter((e) => e.status === activeTab);
+
+  const sortedEvents = [...tabFilteredEvents].sort((a, b) => {
+    if (sortOption.type === "Request Date") {
+      const dateA = new Date(a.requestDate);
+      const dateB = new Date(b.requestDate);
+      return sortOption.order === "Latest"
+        ? dateB.getTime() - dateA.getTime()
+        : dateA.getTime() - dateB.getTime();
+    }
+    return 0;
+  });
+
   return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold mb-6">Admin Event Requests</h1>
-      <div className="flex items-center gap-4 mb-6">
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by title"
-          label="Title"
-        />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
+      <div className="flex items-center gap-4 mb-6 w-full max-w-[1000px]">
+        <div className="max-w-3xl w-full">
+          <SearchBar
+            value={filters.search}
+            onChange={(val) => setFilters((f) => ({ ...f, search: val }))}
+            placeholder="Search by Organization or Event Request"
+            label="Organization/Request Title"
+          />
+        </div>
         <Button
           variant="outline"
+          className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
           onClick={() => setFilterOpen(true)}
-          className="bg-[#284b3e] text-white"
         >
           Filter <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
         <Button
           variant="outline"
-          onClick={() => setSortOpen(true)}
-          className="bg-[#284b3e] text-white"
+          className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
+          onClick={() => setSortModalOpen(true)}
         >
-          Sort <ChevronDown className="ml-2 h-4 w-4" />
+          Sort By <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </div>
+      <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="space-y-4">
-        {filtered.map((event) => (
-          <EventRequestCard
-            key={event.id}
-            event={event}
-            showAccordion={false}
-            onEdit={() => {
-              window.location.href = `/admin/event-requests/${event.id}`;
-            }}
-          />
-        ))}
+      <div className="flex flex-col items-center">
+        <div className="mt-5 space-y-4 w-[1000px]">
+          {sortedEvents.length === 0 && (
+            <div className="text-muted-foreground text-center py-10">No event requests found.</div>
+          )}
+          {sortedEvents.map((event) => (
+            <div
+              key={event.id}
+              onClick={() => router.push(`/admin/event-requests/${event.id}`)}
+              className="cursor-pointer"
+            >
+              <EventRequestCard event={event} showAccordion={false} showOrgName={true} />
+            </div>
+          ))}
+        </div>
       </div>
-
-      <SortModal isOpen={sortOpen} onClose={() => setSortOpen(false)} onApply={() => {}} />
+      <SortModal
+        isOpen={isSortModalOpen}
+        onClose={() => setSortModalOpen(false)}
+        onApply={(option) => setSortOption(option)}
+      />
       <FilterModal
-        isOpen={filterOpen}
+        isOpen={isFilterOpen}
         onClose={() => setFilterOpen(false)}
-        onApply={() => {}}
-        filters={{ search: "", modality: "", location: "" }}
-        setFilters={() => {}}
+        onApply={(newFilters) => setFilters(newFilters)}
+        filters={filters}
+        setFilters={setFilters}
         mode="admin"
       />
     </div>

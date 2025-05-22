@@ -1,32 +1,28 @@
-// components/admin/update-event-request/AdminEventStatusPanel.tsx
 "use client";
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import FileUploadForm from "@/components/ui/file-upload-form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { FilePondUploader } from "@/components/ui/filepond-uploader";
 
 const officeSteps = [
-  { key: "osa", label: "Forwarded to OSA Director" },
-  { key: "ovcaa", label: "Forwarded to OVCA/OVCAA" },
-  { key: "chancellor", label: "Forwarded to Chancellor" },
+  { key: "soa", label: "SOA Coordinator" },        // Always present
+  { key: "osa", label: "OSA Director" },
+  { key: "ovcaa", label: "OVCA/OVCAA" },
+  { key: "chancellor", label: "Chancellor" },
 ];
 
 export function AdminEventStatusPanel({
-  eventId,
   status,
   onStatusChange,
   onSubmit,
   initialData = {},
 }: {
-  eventId: string;
   status: string;
   onStatusChange: (status: string) => void;
-  onSubmit?: (data: any) => void;
+  onSubmit: (data: any) => void;
   initialData?: any;
 }) {
   const [comment, setComment] = useState(initialData.comment || "");
@@ -35,8 +31,9 @@ export function AdminEventStatusPanel({
   const [progress, setProgress] = useState<{ [k: string]: boolean }>(
     initialData.progress || {}
   );
-  const [saving, setSaving] = useState(false);
+  const [noa, setNoa] = useState<{ url: string; size: number } | null>(initialData.noa || null);
 
+  // Add issue
   const handleAddIssue = () => {
     if (issueInput.trim()) {
       setIssues([...issues, issueInput.trim()]);
@@ -44,33 +41,19 @@ export function AdminEventStatusPanel({
     }
   };
 
+  // Remove issue
+  const handleRemoveIssue = (idx: number) => {
+    setIssues((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Toggle office progress step
   const handleProgressChange = (key: string) => {
     setProgress((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const ref = doc(db, "eventRequests", eventId);
-      await updateDoc(ref, {
-        status,
-        comment,
-        issues,
-        progress,
-      });
-      if (onSubmit) {
-        onSubmit({ status, comment, issues, progress });
-      }
-      alert("Changes saved successfully!");
-    } catch (err) {
-      alert("Failed to save changes: " + (err as Error).message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <div className="space-y-4">
+      {/* Status Dropdown */}
       <label className="block font-medium mb-1">Update Status</label>
       <select
         value={status}
@@ -85,6 +68,7 @@ export function AdminEventStatusPanel({
         <option value="Disapproved">Disapproved</option>
       </select>
 
+      {/* Comments and NOA upload for terminal states */}
       {(status === "Disapproved" || status === "Approved") && (
         <>
           <label className="block font-medium">Comments/Notes</label>
@@ -93,9 +77,20 @@ export function AdminEventStatusPanel({
             onChange={(e) => setComment(e.target.value)}
             placeholder="Enter comments or notes here..."
           />
+          <label className="block font-medium mt-2">
+            {status === "Disapproved"
+              ? "Notice of Disapproval File (PDF)"
+              : "Notice of Approval File (PDF)"}
+          </label>
+          <FilePondUploader
+            initialUrl={noa?.url}
+            onUpload={({ url, size }) => setNoa({ url, size })}
+            onRemove={() => setNoa(null)}
+          />
         </>
       )}
 
+      {/* Issues block */}
       {status === "Issues Found" && (
         <>
           <label className="block font-medium">List Issues</label>
@@ -111,12 +106,24 @@ export function AdminEventStatusPanel({
           </div>
           <ul className="list-disc ml-6">
             {issues.map((issue, idx) => (
-              <li key={idx}>{issue}</li>
+              <li key={idx} className="flex items-center justify-between">
+                {issue}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-600 ml-2"
+                  onClick={() => handleRemoveIssue(idx)}
+                >
+                  Remove
+                </Button>
+              </li>
             ))}
           </ul>
         </>
       )}
 
+      {/* Progress tracker for forwarding */}
       {status === "Forwarded to Offices" && (
         <>
           <label className="block font-medium">Progress</label>
@@ -135,12 +142,20 @@ export function AdminEventStatusPanel({
         </>
       )}
 
+      {/* Submit button */}
       <Button
         className="w-full bg-[#284b3e] hover:bg-[#284b3e]/90"
-        onClick={handleSave}
-        disabled={saving}
+        onClick={() =>
+          onSubmit({
+            status,
+            comment,
+            issues: issues ?? [],
+            progress: progress ?? {},
+            noa: (status === "Approved" || status === "Disapproved") ? noa : undefined,
+          })
+        }
       >
-        {saving ? "Saving..." : "Save Changes"}
+        Save Changes
       </Button>
     </div>
   );

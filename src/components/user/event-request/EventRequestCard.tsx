@@ -1,11 +1,10 @@
-// components/ui/user/event-request/EventRequestCard.tsx
+// src/components/user/event-request/EventRequestCard.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Download, Eye, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { EventRequestDialog } from "@/components/ui/event-request-dialog";
 import { EventRequest } from "@/types/event-request";
 import { ProgressTracker } from "@/components/user/event-request/ProgressTracker";
 import { FilePreviewModal } from "@/components/ui/FilePreviewModal";
@@ -14,10 +13,12 @@ export function EventRequestCard({
   event,
   showAccordion = true,
   onEdit,
+  showOrgName = false,
 }: {
   event: EventRequest;
   showAccordion?: boolean;
   onEdit?: (event: EventRequest) => void;
+  showOrgName?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [previewFile, setPreviewFile] = useState<{ url: string; label: string } | null>(null);
@@ -44,7 +45,14 @@ export function EventRequestCard({
     >
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold mb-1">{event.title}</h3>
+          <div className="mb-1 flex items-center gap-2">
+            <h3 className="text-xl font-bold">{event.title}</h3>
+            {(showOrgName && (event.organizationName || event.organizationEmail)) && (
+               <span className="inline-block px-3 py-0.5 bg-green-50 text-green-800 text-xs rounded-full font-medium border border-green-100">
+                {event.organizationName || event.organizationEmail}
+              </span>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
             <span className="font-medium">Event Date:</span> {event.eventDate || "N/A"}
             <span className="mx-2">|</span>
@@ -54,7 +62,6 @@ export function EventRequestCard({
             <span className="font-medium">Event Type:</span> {event.modality || "N/A"}
           </p>
         </div>
-
         <div className="flex items-center gap-3">
           <div
             className={cn(
@@ -113,8 +120,8 @@ export function EventRequestCard({
             ))}
           </div>
 
-          {/* Right Side: Status & Action */}
-          <div>
+          {/* Right Side: Status, Action, and NOA */}
+          <div className="space-y-2">
             {event.status === "Awaiting Evaluation" && (
               <>
                 <p className="mb-4 text-muted-foreground">
@@ -137,9 +144,10 @@ export function EventRequestCard({
                 <p className="font-semibold mb-2">Progress Tracker</p>
                 <ProgressTracker
                   steps={[
-                    { label: "SOA Coordinator", completed: true },
-                    { label: "OSA Director", completed: true },
-                    { label: "OVCAA", completed: false },
+                    { label: "SOA Coordinator", completed: !!event.progress?.soa },
+                    { label: "OSA Director", completed: !!event.progress?.osa },
+                    { label: "OVCA/OVCAA", completed: !!event.progress?.ovcaa },
+                    { label: "Chancellor", completed: !!event.progress?.chancellor },
                   ]}
                 />
               </div>
@@ -163,24 +171,47 @@ export function EventRequestCard({
                 </Button>
               </>
             )}
+
             {(event.status === "Approved" || event.status === "Disapproved") && (
               <>
                 <p className="mb-2">
                   <span className="font-semibold">Admin feedback:</span>{" "}
                   <i className="text-muted-foreground">{event.comment || "-"}</i>
                 </p>
-                <p className="mb-1 font-medium">Download the NOA:</p>
-                <a
-                  className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200"
-                  href="#"
-                  download
-                >
-                  <span className="flex items-center gap-2">
-                    <Download className="w-4 h-4 text-green-700" />
-                    <span className="text-sm font-medium">NOA.pdf</span>
-                  </span>
-                  <span className="text-xs text-gray-500">200 KB</span>
-                </a>
+                {/* NOA block - same style as requirements */}
+                {event.noa && (
+                  <div className="space-y-1 mt-3">
+                    <p className="text-muted-foreground font-semibold">
+                      Notice of {event.status === "Approved" ? "Approval" : "Disapproval"}:
+                    </p>
+                    <div className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                      <span className="flex items-center gap-2">
+                        <Download className="w-4 h-4 text-green-700" />
+                        <a
+                          href={event.noa.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="text-sm font-medium underline"
+                        >
+                          NOA.pdf
+                        </a>
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500">
+                          {((event.noa.size || 0) / 1024).toFixed(0)} KB
+                        </span>
+                        <Eye
+                          className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewFile({ label: "NOA", url: event.noa!.url });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

@@ -12,13 +12,26 @@ export interface EventRequest {
   eventDate: string;
   status: string;
   modality: "Online" | "On Campus" | "Off Campus";
-  organizationName: string;
+  organizationId: string;       
+  organizationEmail: string;   
   location?: "Iloilo" | "Miagao";
   comment?: string;
   issues?: string[];
-  progress?: Record<string, boolean>;
+  progress?: {
+    soa?: boolean;
+    osa?: boolean;
+    ovcaa?: boolean;
+    chancellor?: boolean;
+  };
   files?: Record<string, FileData>;
-  noa?: FileData; // For approved/disapproved
+  noa?: FileData;
+  requirementsChecklist?: Record<string, boolean>;
+  organizationName?: string; // for joining, optional!
+
+}
+
+export interface EventRequestWithOrgName extends EventRequest {
+  organizationName: string; // fetched from users collection, not stored in eventRequests
 }
 
 export type EventRequestFormMode = "new" | "edit";

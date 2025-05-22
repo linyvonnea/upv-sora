@@ -5,34 +5,36 @@ import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
+// Customize this as needed for your user profile structure
 interface AuthContextType {
-  user: any | null;
-  role: string | null;
+  user: any | null;         // Firebase Auth user
+  profile: any | null;      // User profile from Firestore (includes role, orgName, etc)
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  role: null,
+  profile: null,
   loading: true,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+
       if (firebaseUser) {
-        const uid = firebaseUser.uid;
-        const roleDoc = await getDoc(doc(db, "roles", uid));
-        const roleData = roleDoc.exists() ? roleDoc.data() : null;
-        setRole(roleData?.role || null);
+        // 🔥 Fetch user profile from users collection (not roles)
+        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+        setProfile(userDoc.exists() ? userDoc.data() : null);
       } else {
-        setRole(null);
+        setProfile(null);
       }
+
       setLoading(false);
     });
 
@@ -40,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading }}>
       {children}
     </AuthContext.Provider>
   );
