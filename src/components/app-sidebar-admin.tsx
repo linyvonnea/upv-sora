@@ -19,10 +19,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { logout } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function AppSidebarAdmin() {
+  const [loading, setLoading] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
+  const handleLogout = async () => {
+    setLoading(true);
+
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
   const adminLinks = [
     { label: "Event Requests", href: "/admin/event-requests", icon: Calendar },
     { label: "Pubmat Requests", href: "/admin/pubmat-requests", icon: LucideImage },
@@ -88,12 +106,11 @@ export function AppSidebarAdmin() {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                console.log("Log out clicked");
-                // insert firebase auth sign out here
+                handleLogout();
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Log out
+              {loading ? "Logging out..." : "Log Out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

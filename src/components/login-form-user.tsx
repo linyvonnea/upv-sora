@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 export function LoginFormUser({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+  }: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
