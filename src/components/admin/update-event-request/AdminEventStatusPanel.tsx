@@ -1,43 +1,39 @@
+"use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import FileUploadForm from "@/components/ui/file-upload-form";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FilePondUploader } from "@/components/ui/filepond-uploader";
 
-// Steps used when status is "Forwarded to Offices"
 const officeSteps = [
-  { key: "osa", label: "Forwarded to OSA Director" },
-  { key: "ovcaa", label: "Forwarded to OVCA/OVCAA" },
-  { key: "chancellor", label: "Forwarded to Chancellor" },
+  { key: "soa", label: "SOA Coordinator" },        // Always present
+  { key: "osa", label: "OSA Director" },
+  { key: "ovcaa", label: "OVCA/OVCAA" },
+  { key: "chancellor", label: "Chancellor" },
 ];
 
-// Main component for updating an event's status in the admin panel
 export function AdminEventStatusPanel({
-  status, // current status value
-  onStatusChange, // callback to update status
-  onSubmit, // callback for submitting the updated data
-  initialData = {}, // optional initial values (for editing an existing item)
+  status,
+  onStatusChange,
+  onSubmit,
+  initialData = {},
 }: {
   status: string;
   onStatusChange: (status: string) => void;
   onSubmit: (data: any) => void;
   initialData?: any;
 }) {
-  // Local state for comment/note input
   const [comment, setComment] = useState(initialData.comment || "");
-  // State for uploaded file (if any)
-  const [file, setFile] = useState<File | null>(null);
-  // List of issues entered by the user
   const [issues, setIssues] = useState<string[]>(initialData.issues || []);
-  // Current text input for a new issue
   const [issueInput, setIssueInput] = useState("");
-  // Tracks checkbox progress for each office step
   const [progress, setProgress] = useState<{ [k: string]: boolean }>(
     initialData.progress || {}
   );
+  const [noa, setNoa] = useState<{ url: string; size: number } | null>(initialData.noa || null);
 
-  // Adds the issue from the input to the issues list
+  // Add issue
   const handleAddIssue = () => {
     if (issueInput.trim()) {
       setIssues([...issues, issueInput.trim()]);
@@ -45,15 +41,19 @@ export function AdminEventStatusPanel({
     }
   };
 
-  // Toggles the progress checkbox for a given office step
+  // Remove issue
+  const handleRemoveIssue = (idx: number) => {
+    setIssues((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Toggle office progress step
   const handleProgressChange = (key: string) => {
     setProgress((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // UI rendering starts here
   return (
     <div className="space-y-4">
-      {/* Dropdown for selecting status */}
+      {/* Status Dropdown */}
       <label className="block font-medium mb-1">Update Status</label>
       <select
         value={status}
@@ -68,7 +68,7 @@ export function AdminEventStatusPanel({
         <option value="Disapproved">Disapproved</option>
       </select>
 
-      {/* Show comments and file upload for terminal states */}
+      {/* Comments and NOA upload for terminal states */}
       {(status === "Disapproved" || status === "Approved") && (
         <>
           <label className="block font-medium">Comments/Notes</label>
@@ -77,17 +77,20 @@ export function AdminEventStatusPanel({
             onChange={(e) => setComment(e.target.value)}
             placeholder="Enter comments or notes here..."
           />
-          {/* File upload depending on approval type */}
           <label className="block font-medium mt-2">
             {status === "Disapproved"
-              ? "Notice of Disapproval File"
-              : "Notice of Approval File"}
+              ? "Notice of Disapproval File (PDF)"
+              : "Notice of Approval File (PDF)"}
           </label>
-          <FileUploadForm />
+          <FilePondUploader
+            initialUrl={noa?.url}
+            onUpload={({ url, size }) => setNoa({ url, size })}
+            onRemove={() => setNoa(null)}
+          />
         </>
       )}
 
-      {/* Show dynamic list of issues for status "Issues Found" */}
+      {/* Issues block */}
       {status === "Issues Found" && (
         <>
           <label className="block font-medium">List Issues</label>
@@ -103,13 +106,24 @@ export function AdminEventStatusPanel({
           </div>
           <ul className="list-disc ml-6">
             {issues.map((issue, idx) => (
-              <li key={idx}>{issue}</li>
+              <li key={idx} className="flex items-center justify-between">
+                {issue}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-600 ml-2"
+                  onClick={() => handleRemoveIssue(idx)}
+                >
+                  Remove
+                </Button>
+              </li>
             ))}
           </ul>
         </>
       )}
 
-      {/* Show progress checkboxes for status "Forwarded to Offices" */}
+      {/* Progress tracker for forwarding */}
       {status === "Forwarded to Offices" && (
         <>
           <label className="block font-medium">Progress</label>
@@ -128,16 +142,16 @@ export function AdminEventStatusPanel({
         </>
       )}
 
-      {/* Submit button that triggers onSubmit with all the collected data */}
+      {/* Submit button */}
       <Button
         className="w-full bg-[#284b3e] hover:bg-[#284b3e]/90"
         onClick={() =>
           onSubmit({
             status,
             comment,
-            file,
-            issues,
-            progress,
+            issues: issues ?? [],
+            progress: progress ?? {},
+            noa: (status === "Approved" || status === "Disapproved") ? noa : undefined,
           })
         }
       >
