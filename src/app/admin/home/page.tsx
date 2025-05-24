@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
-export default function AdminPage() {
-  redirect("/admin/event-requests");
+export default function AdminHome() {
+  return <div className="p-6">Admin Home Page</div>;
 }

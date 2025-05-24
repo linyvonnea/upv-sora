@@ -1,6 +1,6 @@
 "use client";
 
-export default function AdminPubmatRequestsPage() {
+export default function UserPubmatRequestsPage() {
   return (
     <div className="flex-1 flex items-center justify-center h-[calc(100vh-4rem)]">
       <div className="p-6 flex flex-col items-center">

@@ -2,7 +2,7 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { useAuth } from "@/contexts/AuthContext"; 
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -18,9 +18,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading...
-      </div>
+      <div className="min-h-screen flex items-center justify-center text-gray-500">Loading...</div>
     );
   }
 
@@ -34,9 +32,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen w-screen">
         <AppSidebar />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 flex items-center justify-center p-6">{children}</main>
       </div>
     </SidebarProvider>
   );

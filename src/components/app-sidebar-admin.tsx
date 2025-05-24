@@ -10,7 +10,9 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Calendar, Image as LucideImage, LogOut, Settings, ChevronDown } from "lucide-react";
+
+import { Calendar, Image as LucideImage, LogOut, Settings, ChevronDown, Home } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +44,7 @@ export function AppSidebarAdmin() {
   }
   
   const adminLinks = [
+    { label: "Home", href: "/admin/home", icon: Home },
     { label: "Event Requests", href: "/admin/event-requests", icon: Calendar },
     { label: "Pubmat Requests", href: "/admin/pubmat-requests", icon: LucideImage },
   ];

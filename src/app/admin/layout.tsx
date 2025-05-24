@@ -26,9 +26,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
       <AdminAuthGuard>
-        <div className="flex min-h-screen">
+        <div className="flex h-screen w-screen">
           <AppSidebarAdmin />
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 flex items-center justify-center p-6">{children}</main>
         </div>
       </AdminAuthGuard>
     </SidebarProvider>
