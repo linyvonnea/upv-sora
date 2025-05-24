@@ -13,7 +13,7 @@ import Link from "next/link";
 import {
   Calendar,
   Home,
-  Image,
+  Image as LucideImage,
   User,
   Megaphone,
   LogOut,
@@ -27,14 +27,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
+import { logout } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function AppSidebar() {
-  const pathname = usePathname();
+  const [loading, setLoading] = useState(false);
+  const pathname = usePathname(); 
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    setLoading(true);
+
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const mainLinks = [
     { label: "Home", href: "/user/home", icon: Home },
     { label: "Event Requests", href: "/user/event-requests", icon: Calendar },
-    { label: "Pubmat Request", href: "/user/pubmat-requests", icon: Image },
+    { label: "Pubmat Request", href: "/user/pubmat-requests", icon: LucideImage },
     { label: "Information Board", href: "/user/information", icon: Megaphone },
     // { label: "Settings", href: "/user/settings", icon: Settings },
   ];
@@ -42,7 +61,10 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="text-lg font-bold pl-4">UPV-SORA</div>
+        <div className="inline-flex items-center gap-2 text-lg font-bold">
+          <Image src="/images/logo_green.png" alt="UPV Sora Logo" width={45} height={45} />
+          UPV-SORA
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -96,12 +118,11 @@ export function AppSidebar() {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                console.log("Log out clicked");
-                // insert firebase auth sign out here
+                handleLogout();
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Log out
+              {loading ? "Logging out..." : "Log Out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

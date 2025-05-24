@@ -1,12 +1,12 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface Step {
-  label: string
-  completed: boolean
+  label: string;
+  completed: boolean;
 }
 
 interface ProgressTrackerProps {
-  steps: Step[]
+  steps: Step[];
 }
 
 export function ProgressTracker({ steps }: ProgressTrackerProps) {
@@ -14,7 +14,6 @@ export function ProgressTracker({ steps }: ProgressTrackerProps) {
     <div className="flex flex-col relative ml-4">
       {steps.map((step, index) => (
         <div key={index} className="flex items-start relative">
-          {/* Dot */}
           <div
             className={cn(
               "w-3 h-3 rounded-full z-10 mt-0.5",
@@ -23,16 +22,12 @@ export function ProgressTracker({ steps }: ProgressTrackerProps) {
                 : "border-2 border-green-600 bg-white"
             )}
           />
-
-          {/* Connecting line */}
           {index !== steps.length - 1 && (
             <div className="absolute left-[5px] top-3.5 w-px h-full bg-green-300" />
           )}
-
-          {/* Label */}
           <p className="ml-4 mb-6 text-sm">{step.label}</p>
         </div>
       ))}
     </div>
-  )
+  );
 }

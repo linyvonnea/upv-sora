@@ -1,72 +1,19 @@
+// app/user/event-requests/page.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { EventRequestTabs } from "@/components/user/event-request/EventRequestTabs";
-import { EventRequestCard, EventData } from "@/components/user/event-request/EventRequestCard";
+import { EventRequestCard } from "@/components/user/event-request/EventRequestCard";
 import SortModal from "@/components/ui/SortModal";
 import { FilterModal } from "@/components/ui/filter-modal";
 import { SearchBar } from "@/components/ui/search-bar";
 
-const mockEvents: EventData[] = [
-  {
-    id: 1,
-    status: "Awaiting Evaluation",
-    title: "Event1",
-    requestDate: "April 1, 2025",
-    eventDate: "April 18, 2025",
-    modality: "Online",
-    organizationName: "Org 1",
-  },
-  {
-    id: 2,
-    status: "Under Evaluation",
-    title: "Event2",
-    requestDate: "April 2, 2025",
-    eventDate: "April 20, 2025",
-    modality: "Online",
-    organizationName: "Org 2",
-  },
-  {
-    id: 3,
-    status: "Forwarded to Offices",
-    title: "Event3",
-    requestDate: "April 3, 2025",
-    eventDate: "April 21, 2025",
-    modality: "Online",
-    organizationName: "Org 3",
-  },
-  {
-    id: 4,
-    status: "Issues Found",
-    title: "Event4",
-    requestDate: "April 4, 2025",
-    eventDate: "April 25, 2025",
-    modality: "Online",
-
-    organizationName: "Org 4",
-  },
-  {
-    id: 5,
-    status: "Approved",
-    title: "Event5",
-    requestDate: "April 5, 2025",
-    eventDate: "April 27, 2025",
-    modality: "Online",
-    organizationName: "Org 5",
-  },
-  {
-    id: 6,
-    status: "Disapproved",
-    title: "Event6",
-    requestDate: "April 6, 2025",
-    eventDate: "April 30, 2025",
-    modality: "Online",
-
-    organizationName: "Org 6",
-  },
-];
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserEventRequests } from "@/hooks/useUserEventRequests";
+import { EventRequestDialog } from "@/components/ui/event-request-dialog";
+import type { EventRequest } from "@/types/event-request";
 
 const statusOptions = [
   "Awaiting Evaluation",
@@ -84,20 +31,29 @@ type FilterOptions = {
 };
 
 export default function EventRequestPage() {
+  const { user } = useAuth();
+  const { eventRequests, loading, refetch } = useUserEventRequests();
+
   const [activeTab, setActiveTab] = useState("All");
   const [isSortModalOpen, setSortModalOpen] = useState(false);
+  const [isFilterOpen, setFilterOpen] = useState(false);
+  const [editData, setEditData] = useState<EventRequest | null>(null);
+
   const [sortOption, setSortOption] = useState<{ type: string; order?: string; days?: number }>({
     type: "Request Date",
     order: "Latest",
   });
-  const [isFilterOpen, setFilterOpen] = useState(false);
+
   const [filters, setFilters] = useState<FilterOptions>({
     search: "",
     modality: "",
     location: "",
   });
 
-  const filteredEvents = mockEvents.filter(
+  if (!user) return <p className="p-10">Please login to view event requests.</p>;
+  if (loading) return <p className="p-10">Loading event requests...</p>;
+
+  const filteredEvents = eventRequests.filter(
     (event) =>
       event.title.toLowerCase().includes(filters.search.toLowerCase()) &&
       (filters.modality === "" || event.modality === filters.modality) &&
@@ -146,12 +102,13 @@ export default function EventRequestPage() {
         </Button>
       </div>
 
-      <div className="m-4 ">
+      <div className="m-4">
         <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
+
       <div className="space-y-4 w-[1000px]">
         {sortedEvents.map((event) => (
-          <EventRequestCard key={event.id} event={event} />
+          <EventRequestCard key={event.id} event={event} onEdit={(e) => setEditData(e)} />
         ))}
       </div>
 
@@ -160,6 +117,7 @@ export default function EventRequestPage() {
         onClose={() => setSortModalOpen(false)}
         onApply={(option) => setSortOption(option)}
       />
+
       <FilterModal
         isOpen={isFilterOpen}
         onClose={() => setFilterOpen(false)}
@@ -167,6 +125,16 @@ export default function EventRequestPage() {
         filters={filters}
         setFilters={setFilters}
         mode="user"
+      />
+
+      <EventRequestDialog
+        open={editData !== null}
+        setOpen={(open) => {
+          setEditData(null);
+          if (!open) refetch();
+        }}
+        mode="edit"
+        initialData={editData || {}}
       />
     </div>
   );

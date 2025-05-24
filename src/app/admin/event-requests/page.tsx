@@ -1,13 +1,17 @@
+// app/admin/event-requests/page.tsx
 "use client";
 
 import * as React from "react";
-import { EventRequestCard, EventData } from "@/components/user/event-request/EventRequestCard";
+import { EventRequest } from "@/types/event-request";
 import { SearchBar } from "@/components/ui/search-bar";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import SortModal from "@/components/ui/SortModal";
 import { FilterModal } from "@/components/ui/filter-modal";
+import { useRouter } from "next/navigation";
+import { useAdminEventRequests } from "@/hooks/useAdminEventRequests";
 import { EventRequestTabs } from "@/components/user/event-request/EventRequestTabs";
+import { EventRequestCard } from "@/components/user/event-request/EventRequestCard";
 
 type FilterOptions = {
   search: string;
@@ -15,56 +19,10 @@ type FilterOptions = {
   location: "" | "Iloilo" | "Miagao";
 };
 
-const adminEvents: EventData[] = [
-  {
-    id: 1,
-    title: "Event1",
-    requestDate: "April 1, 2025",
-    eventDate: "April 10, 2025",
-    status: "Awaiting Evaluation",
-    organizationName: "Organization Name",
-    modality: "Online",
-    location: "Iloilo",
-  },
-  {
-    id: 2,
-    title: "Event2",
-    requestDate: "April 5, 2025",
-    eventDate: "April 15, 2025",
-    status: "Issues Found",
-    organizationName: "Komsai.Org",
-    modality: "Online",
-    location: "Iloilo",
-  },
-  {
-    id: 3,
-    title: "Event3",
-    requestDate: "April 20, 2025",
-    eventDate: "April 25, 2025",
-    status: "Disapproved",
-    organizationName: "Miagao Valley",
-    modality: "Online",
-    location: "Iloilo",
-  },
-  // ...other events
-];
-
-const statusOptions = [
-  "Awaiting Evaluation",
-  "Under Evaluation",
-  "Forwarded to Offices",
-  "Issues Found",
-  "Approved",
-  "Disapproved",
-];
-
 export default function AdminEventRequestsPage() {
+  const { eventRequests, loading, error } = useAdminEventRequests();
   const [isSortModalOpen, setSortModalOpen] = React.useState(false);
-  const [sortOption, setSortOption] = React.useState<{
-    type: string;
-    order?: string;
-    days?: number;
-  }>({
+  const [sortOption, setSortOption] = React.useState<{ type: string; order?: string; days?: number; }>({
     type: "Request Date",
     order: "Latest",
   });
@@ -75,9 +33,13 @@ export default function AdminEventRequestsPage() {
     location: "",
   });
   const [activeTab, setActiveTab] = React.useState("All");
+  const router = useRouter();
+
+  if (loading) return <div className="p-10 text-center">Loading event requests…</div>;
+  if (error) return <div className="p-10 text-red-600 text-center">{error}</div>;
 
   // Filtering logic
-  const filteredEvents = adminEvents.filter(
+  const filteredEvents = eventRequests.filter(
     (event) =>
       [event.organizationName, event.title].some((field) =>
         field?.toLowerCase().includes(filters.search.toLowerCase())
@@ -89,7 +51,6 @@ export default function AdminEventRequestsPage() {
   const tabFilteredEvents =
     activeTab === "All" ? filteredEvents : filteredEvents.filter((e) => e.status === activeTab);
 
-  // Sorting logic (same as user side)
   const sortedEvents = [...tabFilteredEvents].sort((a, b) => {
     if (sortOption.type === "Request Date") {
       const dateA = new Date(a.requestDate);
@@ -98,7 +59,6 @@ export default function AdminEventRequestsPage() {
         ? dateB.getTime() - dateA.getTime()
         : dateA.getTime() - dateB.getTime();
     }
-    // Add logic for "Days Before Event" if needed
     return 0;
   });
 
@@ -130,10 +90,20 @@ export default function AdminEventRequestsPage() {
         </Button>
       </div>
       <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
       <div className="flex flex-col items-center">
-        <div className="space-y-4 w-[1000px]">
+        <div className="mt-5 space-y-4 w-[1000px]">
+          {sortedEvents.length === 0 && (
+            <div className="text-muted-foreground text-center py-10">No event requests found.</div>
+          )}
           {sortedEvents.map((event) => (
-            <EventRequestCard key={event.id} event={event} showAccordion={false} />
+            <div
+              key={event.id}
+              onClick={() => router.push(`/admin/event-requests/${event.id}`)}
+              className="cursor-pointer"
+            >
+              <EventRequestCard event={event} showAccordion={false} showOrgName={true} />
+            </div>
           ))}
         </div>
       </div>
