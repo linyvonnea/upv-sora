@@ -1,32 +1,28 @@
+// src/components/user/event-request/EventRequestCard.tsx
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import { ProgressTracker } from "./ProgressTracker";
-import { EventDetails } from "@/components/left-event-details";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, Download, Eye, Pencil } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { EventRequest } from "@/types/event-request";
+import { ProgressTracker } from "@/components/user/event-request/ProgressTracker";
+import { FilePreviewModal } from "@/components/ui/FilePreviewModal";
 
-export interface EventData {
-  id: number;
-  title: string;
-  requestDate: string;
-  eventDate: string;
-  status: string;
-  organizationName?: string;
-  modality?: "Online" | "On-Site";
-  location?: "Iloilo" | "Miagao";
-}
-
-interface EventRequestCardProps {
-  event: EventData;
+export function EventRequestCard({
+  event,
+  showAccordion = true,
+  onEdit,
+  showOrgName = false,
+}: {
+  event: EventRequest;
   showAccordion?: boolean;
-}
-
-export function EventRequestCard({ event, showAccordion = true }: EventRequestCardProps) {
+  onEdit?: (event: EventRequest) => void;
+  showOrgName?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  const [previewFile, setPreviewFile] = useState<{ url: string; label: string } | null>(null);
 
-  // Map status to background/text color
   const statusColors: Record<string, string> = {
     "Awaiting Evaluation": "bg-yellow-100 text-yellow-800",
     "Under Evaluation": "bg-blue-100 text-blue-800",
@@ -36,37 +32,35 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
     Disapproved: "bg-gray-100 text-gray-800",
   };
 
-  // Detect if this is the admin side by checking for showAccordion === false
-  const isAdmin = showAccordion === false;
+  const fileEntries = event.files ? Object.entries(event.files) : [];
 
   return (
     <div
       className={cn(
-        "border rounded-lg p-4 transition",
+        "border rounded-xl p-6 transition bg-white shadow-sm",
         showAccordion ? "cursor-pointer" : "",
         open && "bg-muted/40"
       )}
       onClick={showAccordion ? () => setOpen((prev) => !prev) : undefined}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-start mb-4">
         <div>
-          {/* Organization Name on top (Admin Side only) */}
-          {isAdmin && event.organizationName && (
-            <div className="mb-1">
-              <span className="bg-green-100 text-green-900 px-3 py-1 rounded-full text-xs font-medium">
-                {event.organizationName}
+          <div className="mb-1 flex items-center gap-2">
+            <h3 className="text-xl font-bold">{event.title}</h3>
+            {(showOrgName && (event.organizationName || event.organizationEmail)) && (
+               <span className="inline-block px-3 py-0.5 bg-green-50 text-green-800 text-xs rounded-full font-medium border border-green-100">
+                {event.organizationName || event.organizationEmail}
               </span>
-            </div>
-          )}
-          <h3 className="font-bold text-lg">{event.title}</h3>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">
-            <b>Request Date:</b> {event.requestDate}
+            <span className="font-medium">Event Date:</span> {event.eventDate || "N/A"}
+            <span className="mx-2">|</span>
+            <span className="font-medium">Request Date:</span> {event.requestDate || "N/A"}
           </p>
-          {event.eventDate && (
-            <p className="text-sm text-muted-foreground">
-              <b>Event Date:</b> {event.eventDate}
-            </p>
-          )}
+          <p className="text-sm mt-1">
+            <span className="font-medium">Event Type:</span> {event.modality || "N/A"}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div
@@ -77,7 +71,6 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
           >
             {event.status}
           </div>
-          {/* Accordion button only if showAccordion is true */}
           {showAccordion && (
             <ChevronDown
               className={cn(
@@ -89,41 +82,72 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
         </div>
       </div>
 
-      {/* Accordion content */}
       {showAccordion && open && (
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6 text-sm">
-          {/* Shared info */}
+        <div className="grid md:grid-cols-2 gap-6 border-t pt-6 text-sm">
+          {/* Left Side: Requirements */}
           <div className="space-y-2">
-            <EventDetails event={event} />
+            <p className="font-semibold">Submitted Requirements:</p>
+            {fileEntries.map(([label, fileObj]) => (
+              <div key={label} className="space-y-1">
+                <p className="text-muted-foreground">{label}:</p>
+                <div className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                  <span className="flex items-center gap-2">
+                    <Download className="w-4 h-4 text-green-700" />
+                    <a
+                      href={fileObj.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="text-sm font-medium underline"
+                    >
+                      {label}.pdf
+                    </a>
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-500">
+                      {((fileObj.size || 0) / 1024).toFixed(0)} KB
+                    </span>
+                    <Eye
+                      className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewFile({ label, url: fileObj.url });
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Status-based display */}
-          <div>
+          {/* Right Side: Status, Action, and NOA */}
+          <div className="space-y-2">
             {event.status === "Awaiting Evaluation" && (
               <>
-                <p className="font-bold text-center mb-4">
-                  Your request has been submitted and is waiting to be reviewed by the appropriate
-                  staff
+                <p className="mb-4 text-muted-foreground">
+                  Your request has been submitted and is waiting to be reviewed.
                 </p>
-                <div className="flex justify-center">
-                  <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
-                </div>
+                <Button
+                  className="bg-[#284b3e] hover:bg-[#284b3e]/90"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(event);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Request
+                </Button>
               </>
             )}
-            {event.status === "Under Evaluation" && (
-              <p className="font-bold text-center mb-4">
-                Your request is undergoing detailed evaluation procedure. No action needed at this
-                time.
-              </p>
-            )}
+            {event.status === "Under Evaluation" && <p>No action needed at this time.</p>}
             {event.status === "Forwarded to Offices" && (
               <div>
                 <p className="font-semibold mb-2">Progress Tracker</p>
                 <ProgressTracker
                   steps={[
-                    { label: "SOA Coordinator", completed: true },
-                    { label: "OSA Director", completed: true },
-                    { label: "OVCAA", completed: false },
+                    { label: "SOA Coordinator", completed: !!event.progress?.soa },
+                    { label: "OSA Director", completed: !!event.progress?.osa },
+                    { label: "OVCA/OVCAA", completed: !!event.progress?.ovcaa },
+                    { label: "Chancellor", completed: !!event.progress?.chancellor },
                   ]}
                 />
               </div>
@@ -132,45 +156,75 @@ export function EventRequestCard({ event, showAccordion = true }: EventRequestCa
               <>
                 <p className="font-bold mb-2">Issues found in your request:</p>
                 <ul className="list-disc ml-6 mb-4">
-                  <li>Issue 1</li>
-                  <li>Issue 2</li>
+                  {(event.issues || []).map((issue, idx) => (
+                    <li key={idx}>{issue}</li>
+                  ))}
                 </ul>
-                <Button className="bg-[#284b3e] hover:bg-[#284b3e]/90">Edit Request</Button>
+                <Button
+                  className="bg-[#284b3e] hover:bg-[#284b3e]/90"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit?.(event);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Request
+                </Button>
               </>
             )}
-            {event.status === "Approved" && (
+
+            {(event.status === "Approved" || event.status === "Disapproved") && (
               <>
-                <p className="font-semibold mb-2">
-                  Your request has met all requirements and is officially approved.{" "}
+                <p className="mb-2">
+                  <span className="font-semibold">Admin feedback:</span>{" "}
+                  <i className="text-muted-foreground">{event.comment || "-"}</i>
                 </p>
-                <p className="italic text-muted-foreground mb-4">Admin feedback: Great job!</p>
-                <p>
-                  <b>Download NOA:</b>
-                </p>
-                <a className="text-blue-600 underline" href="#">
-                  NOA.pdf
-                </a>
-              </>
-            )}
-            {event.status === "Disapproved" && (
-              <>
-                <p className="font-semibold mb-2">
-                  Unfortunately, your request has been rejected. You may review the feedback and
-                  reapply
-                </p>
-                <p className="italic text-muted-foreground mb-4">
-                  Reason: Missing advisor signature.
-                </p>
-                <p>
-                  <b>Download NOA:</b>
-                </p>
-                <a className="text-blue-600 underline" href="#">
-                  NOA.pdf
-                </a>
+                {/* NOA block - same style as requirements */}
+                {event.noa && (
+                  <div className="space-y-1 mt-3">
+                    <p className="text-muted-foreground font-semibold">
+                      Notice of {event.status === "Approved" ? "Approval" : "Disapproval"}:
+                    </p>
+                    <div className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md hover:bg-gray-200">
+                      <span className="flex items-center gap-2">
+                        <Download className="w-4 h-4 text-green-700" />
+                        <a
+                          href={event.noa.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          className="text-sm font-medium underline"
+                        >
+                          NOA.pdf
+                        </a>
+                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-gray-500">
+                          {((event.noa.size || 0) / 1024).toFixed(0)} KB
+                        </span>
+                        <Eye
+                          className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewFile({ label: "NOA", url: event.noa!.url });
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
         </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewFile && (
+        <FilePreviewModal
+          title={previewFile.label}
+          url={previewFile.url}
+          onClose={() => setPreviewFile(null)}
+        />
       )}
     </div>
   );
