@@ -48,7 +48,7 @@ export function EventRequestCard({
           <div className="mb-1 flex items-center gap-2">
             <h3 className="text-xl font-bold">{event.title}</h3>
             {(showOrgName && (event.organizationName || event.organizationEmail)) && (
-               <span className="inline-block px-3 py-0.5 bg-green-50 text-green-800 text-xs rounded-full font-medium border border-green-100">
+              <span className="inline-block px-3 py-0.5 bg-green-50 text-green-800 text-xs rounded-full font-medium border border-green-100">
                 {event.organizationName || event.organizationEmail}
               </span>
             )}

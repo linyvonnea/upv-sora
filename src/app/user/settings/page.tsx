@@ -1,36 +1,66 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { EditNameDialog } from "@/components/settings/edit-name-dialog";
 import { EditEmailDialog } from "@/components/settings/edit-email-dialog";
-import { EditPasswordDialog } from "@/components/settings/edit-password-dialog"; 
+import { EditPasswordDialog } from "@/components/settings/edit-password-dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { updateUserUsername, updateUserEmail } from "@/hooks/useAuth";
+import { set } from "date-fns";
 
 export default function UserSettingsPage() {
-  const [orgName, setOrgName] = useState("UPV Org Name");
-  const [email, setEmail] = useState("org@example.com");
-  const [logo, setLogo] = useState("/placeholder-avatar.jpg");
+  const user = useAuth();
+  const [orgName, setOrgName] = useState(user?.profile?.orgName || "Organization Name");
+  const [email, setEmail] = useState(user?.profile?.email || "orgEmail@mail.com");
+  // const [logo, setLogo] = useState("/placeholder-avatar.jpg");
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          setLogo(reader.result.toString());
-          toast.success("Profile picture updated successfully!", {
-            style: { background: "#e6fbe9", color: "#0c4a1f" },
-          });
-        }
-      };
-      reader.readAsDataURL(file);
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       if (reader.result) {
+  //         setLogo(reader.result.toString());
+  //         toast.success("Profile picture updated successfully!", {
+  //           style: { background: "#e6fbe9", color: "#0c4a1f" },
+  //         });
+  //       }
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handleNameChange = (newName: string) => {
+    try {
+      updateUserUsername(user.user, newName);
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      toast.success("Organization name updated successfully!", {
+        style: { background: "#e6fbe9", color: "#0c4a1f" },
+      });
     }
-  };
+    setOrgName(newName);
+  }
+
+  const handleEmailChange = (newEmail: string) => {
+    try {
+      updateUserEmail(user.user, newEmail);
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      toast.success("Email updated successfully! Please log in again.", {
+        style: { background: "#e6fbe9", color: "#0c4a1f" },
+      });
+    }
+    setEmail(newEmail);
+  }
 
   return (
     <div className="flex flex-col gap-8 items-center px-6 pt-20">
@@ -40,7 +70,7 @@ export default function UserSettingsPage() {
           <h1 className="text-xl font-semibold">Organization Profile</h1>
         </CardHeader>
         <CardContent className="flex flex-col sm:flex-row gap-10 items-start">
-          {/* Avatar */}
+          {/* Avatar
           <div className="relative cursor-pointer" onClick={() => fileInputRef.current?.click()}>
             <Avatar className="h-24 w-24">
               <AvatarImage src={logo} />
@@ -56,12 +86,12 @@ export default function UserSettingsPage() {
               onChange={handleFileChange}
               className="hidden"
             />
-          </div>
+          </div> */}
 
           {/* Editable Fields */}
           <div className="flex-1 space-y-4 w-full">
-            <EditNameDialog value={orgName} onSave={setOrgName} />
-            <EditEmailDialog value={email} onSave={setEmail} />
+            <EditNameDialog value={orgName} onSave={handleNameChange} />
+            <EditEmailDialog value={email} onSave={handleEmailChange} />
           </div>
         </CardContent>
       </Card>
@@ -82,7 +112,7 @@ export default function UserSettingsPage() {
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>
-          <EditPasswordDialog open={openPasswordDialog} setOpen={setOpenPasswordDialog} />
+          <EditPasswordDialog open={openPasswordDialog} setOpen={setOpenPasswordDialog}/>
         </CardContent>
       </Card>
     </div>
