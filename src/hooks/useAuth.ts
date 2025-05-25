@@ -1,6 +1,6 @@
 import { auth, db } from "@/lib/firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { signInWithEmailAndPassword, signOut, updateEmail, updatePassword } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 interface UserProfile {
   email: string;
@@ -48,3 +48,29 @@ export const login = async (email: string, password: string) => {
 export const logout = async () => {
   await signOut(auth);
 };
+
+/**
+ * Update user name
+ */
+export const updateUserUsername = async (user: any, newName: string) => {
+  const userDocRef = doc(db, "users", user.uid);
+  await updateDoc(userDocRef, {orgName: newName});
+}
+
+/**
+ * Update user email
+ */
+export const updateUserEmail = async (user: any, newEmail: string) => {
+  const userDocRef = doc(db, "users", user.uid);
+  await updateEmail(user, newEmail);
+  await updateDoc(userDocRef, {email: newEmail});
+  logout();
+}
+
+/**
+ * Update user password
+ */
+export const updateUserPassword = async (user: any, newPassword: string) => {
+  await updatePassword(user, newPassword);
+  logout();
+}

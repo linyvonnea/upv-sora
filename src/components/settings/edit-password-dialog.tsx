@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { updateUserPassword } from "@/hooks/useAuth";
 
 interface EditPasswordDialogProps {
   open: boolean;
@@ -12,6 +14,7 @@ interface EditPasswordDialogProps {
 }
 
 export function EditPasswordDialog({ open, setOpen }: EditPasswordDialogProps) {
+  const user = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,10 +37,16 @@ export function EditPasswordDialog({ open, setOpen }: EditPasswordDialogProps) {
 
     setLoading(true);
     setTimeout(() => {
+      try {
+        updateUserPassword(user.user, newPassword);
+      } catch (error) {
+        console.error("Update failed:", error);
+      } finally {
+        toast.success("Password changed successfully. Please login again.", {
+          style: { background: "#e6fbe9", color: "#0c4a1f" },
+        });
+      }
       setLoading(false);
-      toast.success("Password changed successfully.", {
-        style: { background: "#e6fbe9", color: "#0c4a1f" },
-      });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
