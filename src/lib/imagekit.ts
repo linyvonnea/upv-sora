@@ -1,11 +1,4 @@
 // src/lib/imagekit.ts
-import ImageKit from "imagekit";
-
-export const imagekit = new ImageKit({
-  publicKey: "public_1fxuVUUGABnaryoSMj/JQhgpJQU=",
-  privateKey: "private_dc9/rfY4ptve05YDSPFvam7fYs4=",
-  urlEndpoint: "https://ik.imagekit.io/upvsora",
-});
 
 export async function uploadFileToServer(file: File): Promise<string | null> {
   const formData = new FormData();
