@@ -30,9 +30,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { logout } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebar() {
+  const user = useAuth();
   const [loading, setLoading] = useState(false);
   const pathname = usePathname(); 
   const router = useRouter();
@@ -96,13 +98,13 @@ export function AppSidebar() {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center justify-between w-full p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors cursor-pointer">
               <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8">
+                {/* <Avatar className="h-8 w-8">
                   <AvatarImage src="/placeholder-avatar.jpg" />
                   <AvatarFallback>UP</AvatarFallback>
-                </Avatar>
+                </Avatar> */}
                 <div className="flex flex-col text-left">
-                  <p className="text-sm font-medium leading-none">shadcn</p>
-                  <p className="text-xs text-muted-foreground">m@example.com</p>
+                  <p className="text-sm font-medium leading-none">{ user?.profile?.orgName || "Organization Name" }</p>
+                  <p className="text-xs text-muted-foreground">{ user?.profile?.email || "Organization Email" }</p>
                 </div>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
