@@ -31,7 +31,7 @@ export function LoginFormAdmin({
     try {
       const { role } = await login(email, password);
       if (role === "admin") {
-        router.push("/admin/event-requests");
+        router.push("/admin/home");
       } else if (role === "organization") {
         router.push("/user/home");
       } else {
