@@ -37,7 +37,7 @@ export function OnlineActivitySection() {
         </div>
         <ul className="list-none text-gray-700 space-y-1">
           <li className="flex items-center gap-2">
-            <Bs1CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs1CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Submit accomplished forms/request letter, conforme, publicity materials, and other
               required documents.
@@ -46,7 +46,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs2CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs2CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Receives application forms and checks completeness of requirements and nature of
               activity.
@@ -57,7 +57,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs3CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs3CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Forwards application to SOA Coordinator for recommending approval.
               <div className="italic text-xs text-gray-500">
@@ -67,7 +67,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs4CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs4CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Recommends approval and endorses application for approval of OSA Director.
               <div className="italic text-xs text-gray-500">
@@ -77,7 +77,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs5CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs5CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Approves/Disapproves application to hold activities.
               <div className="italic text-xs text-gray-500">Person Responsible: OSA Director</div>
@@ -85,7 +85,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs6CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs6CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Logs important details of approved/disapproved activity.
               <div className="italic text-xs text-gray-500">Person Responsible: OSA Director</div>
@@ -93,7 +93,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs7CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs7CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Releases the approved/disapproved application form with the NOA.
               <div className="italic text-xs text-gray-500">
@@ -103,7 +103,7 @@ export function OnlineActivitySection() {
           </li>
           <hr />
           <li className="flex items-center gap-2">
-            <Bs8CircleFill className="text-[#8E1537] min-w-10 min-h-10 mb-5 mt-5" />
+            <Bs8CircleFill className="text-[#38715c] min-w-10 min-h-10 mb-5 mt-5" />
             <div>
               Receive the approved/disapproved application.
               <div className="italic text-xs text-gray-500">Person Responsible: Client</div>

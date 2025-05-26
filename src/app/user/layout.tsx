@@ -34,7 +34,10 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <div className="flex h-screen w-screen">
         <AppSidebar />
-        <main className="flex-1 h-full overflow-auto p-6 flex justify-center items-start">
+        <main
+          id="main-content"
+          className="flex-1 h-full overflow-auto p-6 flex justify-center items-start"
+        >
           {children}
         </main>
       </div>
