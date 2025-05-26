@@ -82,8 +82,8 @@ export default function EventRequestPage() {
   });
 
   return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold mb-6">Event Requests History</h1>
+    <div className="flex flex-col justify-center min-h-screen gap-4 w-full max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-left">Event Requests History</h1>
       <div className="flex flex-col gap-2 w-full max-w-[1000px]">
         <div className="flex items-center gap-4 mb-4 w-full max-w-[1000px]">
           <div className="flex-1">

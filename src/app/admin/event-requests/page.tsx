@@ -25,7 +25,9 @@ export default function AdminEventRequestsPage() {
   const [activeTab, setActiveTab] = React.useState("All");
   const [sortBy, setSortBy] = React.useState<"Event Date" | "Request Date">("Request Date");
   const [sortOrder, setSortOrder] = React.useState<"Latest" | "Earliest">("Latest");
-  const [modalityFilter, setModalityFilter] = React.useState<"" | "Online" | "On Campus" | "Off Campus">("");
+  const [modalityFilter, setModalityFilter] = React.useState<
+    "" | "Online" | "On Campus" | "Off Campus"
+  >("");
   const router = useRouter();
 
   if (loading) return <div className="p-10 text-center">Loading event requests…</div>;
@@ -60,9 +62,9 @@ export default function AdminEventRequestsPage() {
   });
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
-      <div className="flex items-center gap-4 mb-6 w-full max-w-[1000px]">
+    <div className="flex flex-col justify-center min-h-screen gap-4 w-full max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-left">Event Requests</h1>
+      <div className="flex flex-col gap-2 w-full max-w-[1000px]">
         <div className="flex-1">
           <SearchBar
             value={filters.search}
