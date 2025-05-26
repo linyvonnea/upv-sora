@@ -14,6 +14,7 @@ import {
 import { OnlineActivitySection } from "@/components/online-activity-section";
 import { OffCampusActivitySection } from "@/components/offcampus-activity-section";
 import { OnCampusActivitySection } from "@/components/oncampus-activity-section";
+import { FaArrowUp } from "react-icons/fa";
 
 const faqs: FAQItem[] = [
   {
@@ -28,7 +29,7 @@ const faqs: FAQItem[] = [
 
 export default function InformationBoardPage() {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       {/* About Section */}
       <div
         id="about"
@@ -73,6 +74,19 @@ export default function InformationBoardPage() {
       <OffCampusActivitySection />
 
       <FAQCollapse faqs={faqs} />
+
+      <button
+        onClick={() => {
+          const el = document.getElementById("main-content");
+          if (el) {
+            el.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }}
+        className="fixed bottom-6 right-6 z-50 bg-[#8E1537] text-white p-3 rounded-full shadow-lg hover:bg-[#6c102b] transition"
+        aria-label="Scroll to top"
+      >
+        <FaArrowUp size={20} />
+      </button>
     </div>
   );
 }
