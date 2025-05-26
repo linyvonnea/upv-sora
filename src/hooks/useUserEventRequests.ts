@@ -21,7 +21,7 @@ export function useUserEventRequests() {
 
     const q = query(
       collection(db, "eventRequests"),
-      where("organizationId", "==", user.uid)
+      where("organizationId", "==", user.uid) // id
     );
 
     // Listen for live updates

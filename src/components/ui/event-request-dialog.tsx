@@ -1,4 +1,3 @@
-// src/components/ui/event-request-dialog.tsx
 "use client";
 
 import { db } from "@/lib/firebase";
@@ -40,6 +39,7 @@ export function EventRequestDialog({
   const [uploadedFiles, setUploadedFiles] = React.useState<
     Record<string, { url: string; size: number }>
   >({});
+  const [othersLink, setOthersLink] = React.useState(initialData?.othersLinks || "");
 
   React.useEffect(() => {
     if (initialData && open) {
@@ -49,7 +49,6 @@ export function EventRequestDialog({
 
       if (initialData.files) {
         const upgradedFiles: Record<string, { url: string; size: number }> = {};
-
         for (const [label, value] of Object.entries(initialData.files)) {
           if (typeof value === "string") {
             upgradedFiles[label] = { url: value, size: 0 };
@@ -57,11 +56,12 @@ export function EventRequestDialog({
             upgradedFiles[label] = value as { url: string; size: number };
           }
         }
-
         setUploadedFiles(upgradedFiles);
       } else {
         setUploadedFiles({});
       }
+
+      setOthersLink(initialData.othersLinks || "");
     }
   }, [initialData, open]);
 
@@ -71,7 +71,6 @@ export function EventRequestDialog({
       if (!eventName.trim()) missing.push("Name");
       if (!eventDate) missing.push("Date of Event");
       if (!modality) missing.push("Modality");
-
       if (missing.length > 0) {
         toast.error(`Please fill in the following required field(s): ${missing.join(", ")}`);
         return;
@@ -82,7 +81,6 @@ export function EventRequestDialog({
         toast.error("Event date is missing.");
         return;
       }
-
       const eventDateStr = eventDate.toLocaleDateString("en-CA");
 
       if (mode === "edit") {
@@ -91,16 +89,15 @@ export function EventRequestDialog({
           return;
         }
         try {
-          // Remove any empty uploads before saving
           const cleanedFiles = Object.fromEntries(
             Object.entries(uploadedFiles).filter(([_, value]) => value.url)
           );
-
           await updateDoc(doc(db, "eventRequests", initialData.id), {
             title: eventName,
             eventDate: eventDateStr,
             modality,
             files: cleanedFiles,
+            othersLink, // Single link
           });
           toast.success("Request updated successfully!");
           setOpen(false);
@@ -114,26 +111,25 @@ export function EventRequestDialog({
           toast.error("You must be logged in to submit a request.");
           return;
         }
-
         try {
           await addDoc(collection(db, "eventRequests"), {
             title: eventName,
             eventDate: eventDateStr,
             requestDate: new Date().toLocaleDateString("en-CA"),
             modality,
-            organizationId: user.uid,              // Store UID
-            organizationEmail: user.email,         // Store Email for reference
+            organizationId: user.uid,
             status: "Awaiting Evaluation",
             files: uploadedFiles,
+            othersLink, // Single link
             createdAt: serverTimestamp(),
           });
-
           setShowSuccess(true);
           setStep(1);
           setEventName("");
           setEventDate(undefined);
           setModality("Online");
           setUploadedFiles({});
+          setOthersLink("");
         } catch (err) {
           console.error(err);
           toast.error("Failed to submit request.");
@@ -175,7 +171,9 @@ export function EventRequestDialog({
 
   const UploadSection = ({ title }: { title: string }) => (
     <div className="mb-4">
-      <Label className="block mb-1" htmlFor={title}>{title}</Label>
+      <Label className="block mb-1" htmlFor={title}>
+        {title}
+      </Label>
       <FilePondUploader
         initialUrl={uploadedFiles[title]?.url}
         onUpload={({ url, size }) =>
@@ -262,19 +260,33 @@ export function EventRequestDialog({
             {step === 2 && (
               <div className="space-y-4">
                 <div className="mb-4">
-                  <span className="font-medium">Download Requirement Forms here: </span>
+                  <span className="font-medium">Download Requirement Forms </span>
                   <a
                     href="https://drive.google.com/drive/folders/19_zBtUBtKYIaxL-V9b1BLRf6462zn-_u"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 underline"
                   >
-                    Google Drive Link
+                    here
                   </a>
                 </div>
                 {requiredDocuments[modality].map((doc) => (
                   <UploadSection key={doc} title={doc} />
                 ))}
+
+                {/* Others Link Field */}
+                <div>
+                  <Label className="block mb-1" htmlFor="othersLink">
+                    Others (Google Drive Link)
+                  </Label>
+                  <Input
+                    id="othersLink"
+                    placeholder="Paste Google Drive link here"
+                    value={othersLink}
+                    onChange={(e) => setOthersLink(e.target.value)}
+                    type="url"
+                  />
+                </div>
               </div>
             )}
 
