@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { FAQCollapse, FAQItem } from "@/components/faqs-dropdown";
 
-const faqs = [
+const faqs: FAQItem[] = [
   {
     question: "Q1",
     answer: "A1",
@@ -12,30 +12,6 @@ const faqs = [
     answer: "A2",
   },
 ];
-
-function FAQCollapse() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <div id="faqs" className="m-[18px] scroll-mt-24">
-      <h2 className="text-xl font-semibold mb-4 text-[#8E1537]">Frequently Asked Questions</h2>
-      <div className="space-y-2">
-        {faqs.map((faq, idx) => (
-          <div key={idx} className="border rounded">
-            <button
-              className="w-full flex justify-between items-center px-4 py-3 text-left font-medium focus:outline-none"
-              onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-            >
-              <span>{faq.question}</span>
-              <span>{openIndex === idx ? "▲" : "▼"}</span>
-            </button>
-            {openIndex === idx && <div className="px-4 pb-4 text-gray-700">{faq.answer}</div>}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function InformationBoardPage() {
   return (
@@ -62,6 +38,11 @@ export default function InformationBoardPage() {
       <nav className="w-full max-w-3xl mx-auto mb-8">
         <ul className="flex justify-center gap-8 border-b pb-2">
           <li>
+            <a href="#process" className="text-[#8E1537] font-medium hover:underline transition">
+              Process
+            </a>
+          </li>
+          <li>
             <a href="#reqs" className="text-[#8E1537] font-medium hover:underline transition">
               Requirements
             </a>
@@ -76,6 +57,7 @@ export default function InformationBoardPage() {
 
       <div id="reqs" className="mt-8">
         <div className="w-[1000px] mx-auto mb-8 flex flex-col gap-6">
+          <h2 className="text-xl font-semibold mb-4 text-[#8E1537]">Requirements</h2>
           <div className="bg-white rounded-lg shadow p-6 border w-full">
             <h3 className="text-lg font-semibold text-[#8E1537] mb-2">Online</h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
@@ -109,25 +91,31 @@ export default function InformationBoardPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6 border w-full">
             <h3 className="text-lg font-semibold text-[#8E1537] mb-2">Off Campus</h3>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
+            <ul className="list-disc list-inside text-gray-700 space-y-1 grid grid-cols-1 md:grid-cols-2 gap-x-8">
               <li>Request Letter</li>
               <li>Signed Conforme of Adviser</li>
-              <li>Details of the Activity</li>
-              <span className="italic first-letter:block text-xs text-gray-500 pl-[15px]">
-                With Activity Flow, Speakers, etc.
-              </span>
+              <li>
+                Details of the Activity
+                <span className="block text-xs text-gray-500 pl-[15px]">
+                  With Activity Flow, Speakers, etc.
+                </span>
+              </li>
+              <li>
+                Coordination with Concerned Offices
+                <span className="block text-xs text-gray-500 pl-[15px]">
+                  (HSU/Security/Local PNP/Brgy. Officials/Principals)
+                </span>
+              </li>
               <li>Security Plan</li>
               <li>Detailed Medical Arrangement with First Aid Kit</li>
-              <li>Coordination with Concerned Offices</li>
-              <span className=" italic block text-xs text-gray-500 pl-[15px]">
-                (HSU/Security/Local PNP/Brgy. Officials/Principals)
-              </span>
               <li>Waivers or Student Participation Agreement</li>
               <li>Barangay/Municipal Clearance to allow Activity Conduction</li>
-              <li>List of Participants</li>
-              <span className="italic block text-xs text-gray-500 pl-[15px]">
-                with Emergency Contact
-              </span>
+              <li>
+                List of Participants
+                <span className="block text-xs text-gray-500 pl-[15px]">
+                  With Emergency Contact
+                </span>
+              </li>
               <li>Itinerary of Travel</li>
               <li>Publication Materials (if any)</li>
               <li>Letter of Partnership (if any)</li>
@@ -136,8 +124,7 @@ export default function InformationBoardPage() {
         </div>
       </div>
 
-      {/* Sections */}
-      <FAQCollapse />
+      <FAQCollapse faqs={faqs} />
     </div>
   );
 }
