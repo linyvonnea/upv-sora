@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EventRequest } from "@/types/event-request";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc, addDoc } from "firebase/firestore";
 
 type Params = { id: string };
 
@@ -56,6 +56,7 @@ export default function AdminEventRequestExpandedPage() {
   const { toast } = useToast();
 
   const [event, setEvent] = useState<EventRequest | null>(null);
+  const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | undefined>("");
   const [requirementsChecklist, setRequirementsChecklist] = useState<Record<string, boolean>>({});
@@ -71,6 +72,7 @@ export default function AdminEventRequestExpandedPage() {
           setEvent(fetchedEvent);
           setStatus(fetchedEvent.status);
           setRequirementsChecklist(fetchedEvent.requirementsChecklist || {});
+          getRequesterEmail(fetchedEvent.organizationId);
         } else {
           setEvent(null);
         }
@@ -93,6 +95,20 @@ export default function AdminEventRequestExpandedPage() {
       return updated;
     });
   };
+
+  const getRequesterEmail = async (organizationId: string) => {
+    try {
+      const orgDoc = await getDoc(doc(db, "users", organizationId));
+      if (orgDoc.exists()) {
+        setRequesterEmail(orgDoc.data()?.email);
+      } else {
+        setRequesterEmail("");
+      }
+    } catch (error) {
+      console.error("Error fetching organization email:", error);
+      return null;
+    }
+  }
 
   const handleStatusPanelSubmit = async (data: Partial<EventRequest>) => {
     if (!event) return;
@@ -119,6 +135,18 @@ export default function AdminEventRequestExpandedPage() {
         description: "The event request was updated successfully.",
         variant: "success",
       });
+
+      const mailData = {
+        to: [requesterEmail],
+        message: {
+          subject: `Event Request Update: ${event.title}`,
+          text: `The event request for "${event.title}" has been updated.`,
+          html: `<p>The event request for <strong>${event.title}</strong> has updates. Log in to your account to check these updates</p>`,
+        },
+      }
+
+      await addDoc(collection(db, "mail"), mailData);
+
     } catch (err) {
       toast({
         title: "Error",
