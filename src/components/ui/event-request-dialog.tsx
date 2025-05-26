@@ -121,8 +121,7 @@ export function EventRequestDialog({
             eventDate: eventDateStr,
             requestDate: new Date().toLocaleDateString("en-CA"),
             modality,
-            organizationId: user.uid,              // Store UID
-            organizationEmail: user.email,         // Store Email for reference
+            organizationId: user.uid, // id lang
             status: "Awaiting Evaluation",
             files: uploadedFiles,
             createdAt: serverTimestamp(),

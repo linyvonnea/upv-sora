@@ -10,21 +10,18 @@ import {
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-
-import { Calendar, Image as LucideImage, LogOut, Settings, ChevronDown, Home } from "lucide-react";
-
+import { Calendar, Image as LucideImage, LogOut, ChevronDown, Home } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { logout } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext"; 
+import { useAuth } from "@/contexts/AuthContext";
 
 export function AppSidebarAdmin() {
   const user = useAuth();
@@ -34,7 +31,6 @@ export function AppSidebarAdmin() {
 
   const handleLogout = async () => {
     setLoading(true);
-
     try {
       await logout();
       router.push("/login");
@@ -43,8 +39,8 @@ export function AppSidebarAdmin() {
     } finally {
       setLoading(false);
     }
-  }
-  
+  };
+
   const adminLinks = [
     { label: "Home", href: "/admin/home", icon: Home },
     { label: "Event Requests", href: "/admin/event-requests", icon: Calendar },
@@ -88,32 +84,17 @@ export function AppSidebarAdmin() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex items-center justify-between w-full p-2 rounded-md bg-muted hover:bg-muted/80 transition-colors cursor-pointer">
-              <div className="flex items-center gap-3">
-                {/* <Avatar className="h-8 w-8">
-                  <AvatarImage src="/admin-avatar.jpg" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar> */}
-                <div className="flex flex-col text-left">
-                  <p className="text-sm font-medium leading-none">Admin</p>
-                  <p className="text-xs text-muted-foreground">{ user?.profile?.email || "Admin Email" }</p>
-                </div>
+              <div className="flex flex-col text-left">
+                <p className="text-sm font-medium leading-none">Admin</p>
+                <p className="text-xs text-muted-foreground">
+                  {user?.profile?.email || "Admin Email"}
+                </p>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent side="top" align="start" className="w-56">
-            <DropdownMenuItem asChild>
-              <Link href="/admin/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                handleLogout();
-              }}
-            >
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               {loading ? "Logging out..." : "Log Out"}
             </DropdownMenuItem>

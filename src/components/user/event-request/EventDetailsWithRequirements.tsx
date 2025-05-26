@@ -24,8 +24,8 @@ export function EventDetailsWithRequirements({ event }: { event: EventRequest })
       </p>
       {/* Show organization name, fallback to email if orgName is missing */}
       <p className="text-sm mt-1">
-        <span className="font-medium">Organization:</span>{" "}
-        {event.organizationName || event.organizationEmail || "N/A"}
+       <span className="font-medium">Organization:</span>{" "}
+  {event.organizationName || "Unknown Org"}
       </p>
 
       {/* Submitted Requirements */}
