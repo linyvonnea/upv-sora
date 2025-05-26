@@ -3,6 +3,17 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
 
 type EventRequest = {
   modality: string;
@@ -70,24 +81,119 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
+  // Data for donut chart
+  const donutData = [
+    { name: "Online", value: stats.online },
+    { name: "On Campus", value: stats.onCampus },
+    { name: "Off Campus", value: stats.offCampus },
+  ];
+  const donutColors = ["#8E1537", "#38715c", "#fbbf24"];
+
+  // Data for bar chart (request status)
+  const barData = [
+    { name: "Awaiting", value: stats.awaiting },
+    { name: "Under Eval", value: stats.underEval },
+    { name: "Forwarded", value: stats.forwarded },
+    { name: "Issues", value: stats.issues },
+    { name: "Approved", value: stats.approved },
+    { name: "Disapproved", value: stats.disapproved },
+  ];
+
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-6">Statistics Dashboard</h1>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div id="about" className="w-full bg-[#8E1537] rounded-lg p-[50px] mx-auto mb-8">
+        <h1 className="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
+        {/* Total and Organizations in a line */}
+        <div className="grid grid-cols md:grid-cols-2 gap-6 mb-6">
           <StatCard label="Total Requests" value={stats.total} />
+          <StatCard label="Organizations" value={stats.orgCount} />
+        </div>
+        {/* Request Status in 4 columns, 2 rows */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
           <StatCard label="Under Evaluation" value={stats.underEval} />
           <StatCard label="Forwarded to Offices" value={stats.forwarded} />
           <StatCard label="Issues Found" value={stats.issues} />
           <StatCard label="Approved" value={stats.approved} />
           <StatCard label="Disapproved" value={stats.disapproved} />
+        </div>
+      </div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard label="Online Events" value={stats.online} />
           <StatCard label="On Campus Events" value={stats.onCampus} />
           <StatCard label="Off Campus Events" value={stats.offCampus} />
-          <StatCard label="Organizations" value={stats.orgCount} />
+        </div>
+      )}
+      {/* Donut Chart and Bar Chart Section */}
+      {!loading && (
+        <div className="w-full max-w-4xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
+          {/* Bar Chart */}
+          <div className="bg-white rounded-xl shadow border p-6 flex-1 flex flex-col items-center">
+            <span className="text-lg font-semibold mb-2 text-[#8E1537]">
+              Request Status Distribution
+            </span>
+            <div className="w-full flex flex-col items-center">
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={barData}>
+                  <XAxis dataKey="name" fontSize={12} />
+                  <YAxis fontSize={12} allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#8E1537" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                {barData.map((entry, idx) => (
+                  <div key={entry.name} className="flex items-center gap-2">
+                    <span className="text-sm">
+                      {entry.name}: <span className="font-bold">{entry.value}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Donut Chart */}
+          <div className="bg-white rounded-xl shadow border p-6 flex-1 flex flex-col items-center">
+            <span className="text-lg font-semibold mb-2 text-[#8E1537]">
+              Event Modality Distribution
+            </span>
+            <div className="w-full flex flex-col items-center">
+              <ResponsiveContainer width={220} height={220}>
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={3}
+                  >
+                    {donutData.map((entry, idx) => (
+                      <Cell key={`cell-${idx}`} fill={donutColors[idx % donutColors.length]} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-6 mt-4">
+                {donutData.map((entry, idx) => (
+                  <div key={entry.name} className="flex items-center gap-2">
+                    <span
+                      className="inline-block w-3 h-3 rounded-full"
+                      style={{ backgroundColor: donutColors[idx % donutColors.length] }}
+                    ></span>
+                    <span className="text-sm">
+                      {entry.name}: <span className="font-bold">{entry.value}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
