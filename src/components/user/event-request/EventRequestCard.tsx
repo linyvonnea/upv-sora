@@ -48,12 +48,12 @@ export function EventRequestCard({
           <div className="mb-1 flex items-center gap-2">
             <h3 className="text-xl font-bold">{event.title}</h3>
             {showOrgName && (
-              <span className="inline-block px-3 py-0.5 bg-green-50 text-green-800 text-xs rounded-full font-medium border border-green-100">
+              <span className="inline-block px-3 py-0.5 bg-[#800000]/75 text-white text-xs rounded-full font-medium border border-[#800000]">
                 {event.organizationName || "Unknown Org"}
               </span>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm">
             <span className="font-medium">Event Date:</span> {event.eventDate || "N/A"}
             <span className="mx-2">|</span>
             <span className="font-medium">Request Date:</span> {event.requestDate || "N/A"}
