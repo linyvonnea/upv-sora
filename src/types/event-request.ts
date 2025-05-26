@@ -26,6 +26,7 @@ export interface EventRequest {
   noa?: FileData;
   requirementsChecklist?: Record<string, boolean>;
   organizationName?: string; // frontend use only
+  othersLinks?: string;
 }
 
 export interface EventRequestWithOrgName extends EventRequest {
@@ -53,8 +54,8 @@ export interface EventRequestDialogProps {
 //   eventDate: string;
 //   status: string;
 //   modality: "Online" | "On Campus" | "Off Campus";
-//   organizationId: string;       
-//   organizationEmail: string;   
+//   organizationId: string;
+//   organizationEmail: string;
 //   location?: "Iloilo" | "Miagao";
 //   comment?: string;
 //   issues?: string[];

@@ -1,9 +1,8 @@
-// src/components/user/event-request/EventRequestCard.tsx
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Download, Eye, Pencil } from "lucide-react";
+import { ChevronDown, Download, Eye, Pencil, Link as LinkIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EventRequest } from "@/types/event-request";
 import { ProgressTracker } from "@/components/user/event-request/ProgressTracker";
@@ -33,6 +32,7 @@ export function EventRequestCard({
   };
 
   const fileEntries = event.files ? Object.entries(event.files) : [];
+  const othersLink: string = event.othersLinks || "";
 
   return (
     <div
@@ -118,6 +118,23 @@ export function EventRequestCard({
                 </div>
               </div>
             ))}
+            {/* Others Link Section */}
+            {othersLink && (
+              <div className="space-y-1 mt-2">
+                <p className="text-muted-foreground">Others:</p>
+                <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-md">
+                  <LinkIcon className="w-4 h-4 text-blue-700" />
+                  <a
+                    href={othersLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium underline break-all"
+                  >
+                    {othersLink}
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Side: Status, Action, and NOA */}
