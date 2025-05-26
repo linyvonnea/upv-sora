@@ -31,9 +31,6 @@ export default function UserDashboard() {
     issues: 0,
     approved: 0,
     disapproved: 0,
-    online: 0,
-    onCampus: 0,
-    offCampus: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +40,7 @@ export default function UserDashboard() {
       const requests: EventRequest[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        if(data.organizationId === user.user.uid) {
+        if (data.organizationId === user.user.uid) {
           requests.push({
             modality: data.modality,
             status: data.status,
@@ -59,9 +56,6 @@ export default function UserDashboard() {
         issues: requests.filter((r) => r.status === "Issues Found").length,
         approved: requests.filter((r) => r.status === "Approved").length,
         disapproved: requests.filter((r) => r.status === "Disapproved").length,
-        online: requests.filter((r) => r.modality === "Online").length,
-        onCampus: requests.filter((r) => r.modality === "On Campus").length,
-        offCampus: requests.filter((r) => r.modality === "Off Campus").length,
       });
       setLoading(false);
     }
@@ -70,21 +64,24 @@ export default function UserDashboard() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-6">Statistics Dashboard</h1>
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols md:grid-cols-1 gap-6 mb-6">
           <StatCard label="Total Requests" value={stats.total} />
+        </div>
+      )}
+
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
           <StatCard label="Under Evaluation" value={stats.underEval} />
           <StatCard label="Forwarded to Offices" value={stats.forwarded} />
           <StatCard label="Issues Found" value={stats.issues} />
           <StatCard label="Approved" value={stats.approved} />
           <StatCard label="Disapproved" value={stats.disapproved} />
-          <StatCard label="Online Events" value={stats.online} />
-          <StatCard label="On Campus Events" value={stats.onCampus} />
-          <StatCard label="Off Campus Events" value={stats.offCampus} />
         </div>
       )}
     </div>

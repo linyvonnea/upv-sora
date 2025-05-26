@@ -101,14 +101,12 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-full">
-      <div id="about" className="w-full bg-[#8E1537] rounded-lg p-[50px] mx-auto mb-8">
+      <div className="w-full bg-[#8E1537] rounded-lg p-[50px] mx-auto mb-8">
         <h1 className="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
-        {/* Total and Organizations in a line */}
         <div className="grid grid-cols md:grid-cols-2 gap-6 mb-6">
           <StatCard label="Total Requests" value={stats.total} />
           <StatCard label="Organizations" value={stats.orgCount} />
         </div>
-        {/* Request Status in 4 columns, 2 rows */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
           <StatCard label="Under Evaluation" value={stats.underEval} />
