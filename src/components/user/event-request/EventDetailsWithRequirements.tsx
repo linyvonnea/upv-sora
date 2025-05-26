@@ -1,3 +1,4 @@
+// src/components/user/event-request/EventDetailsWithRequirements.tsx
 "use client";
 
 import { Download, Eye, Link as LinkIcon } from "lucide-react";
@@ -5,7 +6,13 @@ import { useState } from "react";
 import { EventRequest } from "@/types/event-request";
 import { FilePreviewModal } from "@/components/ui/FilePreviewModal";
 
-export function EventDetailsWithRequirements({ event }: { event: EventRequest }) {
+export function EventDetailsWithRequirements({
+  event,
+  orgName,
+}: {
+  event: EventRequest;
+  orgName?: string | null; // Accept as optional prop
+}) {
   const [previewFile, setPreviewFile] = useState<{ url: string; label: string } | null>(null);
   const fileEntries = event.files ? Object.entries(event.files) : [];
   const othersLink: string = event.othersLinks || "";
@@ -23,7 +30,8 @@ export function EventDetailsWithRequirements({ event }: { event: EventRequest })
         <span className="font-medium">Event Type:</span> {event.modality || "N/A"}
       </p>
       <p className="text-sm mt-1">
-        <span className="font-medium">Organization:</span> {event.organizationName || "Unknown Org"}
+        <span className="font-medium">Organization:</span>{" "}
+        {orgName || event.organizationName || "Unknown Org"}
       </p>
 
       {/* Submitted Requirements */}

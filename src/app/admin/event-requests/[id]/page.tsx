@@ -87,10 +87,7 @@ export default function AdminEventRequestExpandedPage() {
     setRequirementsChecklist((prev) => {
       const updated = { ...prev, [req]: !prev[req] };
       // Auto-switch to "Under Evaluation" if any box is checked
-      if (
-        status === "Awaiting Evaluation" &&
-        Object.values(updated).some((v) => v)
-      ) {
+      if (status === "Awaiting Evaluation" && Object.values(updated).some((v) => v)) {
         setStatus("Under Evaluation");
       }
       return updated;
@@ -111,7 +108,7 @@ export default function AdminEventRequestExpandedPage() {
       console.error("Error fetching organization details:", error);
       return null;
     }
-  }
+  };
 
   const handleStatusPanelSubmit = async (data: Partial<EventRequest>) => {
     if (!event) return;
@@ -146,12 +143,11 @@ export default function AdminEventRequestExpandedPage() {
           data: {
             orgName: orgName || "Unknown Organization",
             title: event.title || "Unknown Event",
-          }
-        }
-      }
+          },
+        },
+      };
 
       await addDoc(collection(db, "mail"), mailData);
-
     } catch (err) {
       toast({
         title: "Error",
@@ -170,7 +166,7 @@ export default function AdminEventRequestExpandedPage() {
     <div className="flex gap-8 p-8 max-w-5xl mx-auto">
       {/* LEFT: Details and requirements */}
       <div className="flex-1">
-        <EventDetailsWithRequirements event={event} />
+        <EventDetailsWithRequirements event={event} orgName={orgName} />
       </div>
       {/* RIGHT: Checklist, status panel, NOA, back btn */}
       <div className="flex-1 space-y-8">
@@ -184,9 +180,7 @@ export default function AdminEventRequestExpandedPage() {
                     checked={!!requirementsChecklist[req]}
                     onCheckedChange={() => toggleChecklist(req)}
                   />
-                  <span className={!!event.files?.[req] ? "" : "text-gray-400"}>
-                    {req}
-                  </span>
+                  <span className={!!event.files?.[req] ? "" : "text-gray-400"}>{req}</span>
                 </li>
               ))}
             </ul>
