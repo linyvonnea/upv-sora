@@ -103,65 +103,63 @@ export default function AdminDashboard() {
     <div className="w-full">
       <div className="w-full bg-[#8E1537] rounded-lg p-[50px] mx-auto mb-8">
         <h1 className="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
-        <div className="grid grid-cols md:grid-cols-2 gap-6 mb-6">
-          <StatCard label="Total Requests" value={stats.total} />
-          <StatCard label="Organizations" value={stats.orgCount} />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
-          <StatCard label="Under Evaluation" value={stats.underEval} />
-          <StatCard label="Forwarded to Offices" value={stats.forwarded} />
-          <StatCard label="Issues Found" value={stats.issues} />
-        </div>
-        <div className="grid grid-cols md:grid-cols-2 gap-6 mb-6">
-          <StatCard label="Approved" value={stats.approved} />
-          <StatCard label="Disapproved" value={stats.disapproved} />
-        </div>
-      </div>
-      {/* Donut Chart Section Only */}
-      {!loading && (
-        <div className="w-full max-w-4xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
-          {/* Donut Chart */}
-          <div className="bg-white rounded-xl shadow border p-6 flex-1 flex flex-col items-center">
-            <span className="text-lg font-semibold mb-2 text-[#8E1537]">
-              Event Modality Distribution
-            </span>
-            <div className="w-full flex flex-col items-center">
-              <ResponsiveContainer width={220} height={220}>
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={3}
-                  >
-                    {donutData.map((entry, idx) => (
-                      <Cell key={`cell-${idx}`} fill={donutColors[idx % donutColors.length]} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex justify-center gap-6 mt-4">
-                {donutData.map((entry, idx) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <span
-                      className="inline-block w-3 h-3 rounded-full"
-                      style={{ backgroundColor: donutColors[idx % donutColors.length] }}
-                    ></span>
-                    <span className="text-sm">
-                      {entry.name}: <span className="font-bold">{entry.value}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-6">
+            <StatCard label="Total Requests" value={stats.total} />
+            <StatCard label="Organizations" value={stats.orgCount} />
+            <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
+            <StatCard label="Under Evaluation" value={stats.underEval} />
+            <StatCard label="Forwarded to Offices" value={stats.forwarded} />
+            <StatCard label="Issues Found" value={stats.issues} />
+          </div>
+          <div className="flex-1 flex flex-col gap-6 items-center">
+            <div className="w-full grid grid-cols-2 gap-6">
+              <StatCard label="Approved" value={stats.approved} />
+              <StatCard label="Disapproved" value={stats.disapproved} />
             </div>
+            {!loading && (
+              <div className="w-full flex flex-col items-center">
+                <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center w-full">
+                  <span className="text-lg font-semibold mb-2 text-[#8E1537]">
+                    Event Modality Distribution
+                  </span>
+                  <ResponsiveContainer width={220} height={220}>
+                    <PieChart>
+                      <Pie
+                        data={donutData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={3}
+                      >
+                        {donutData.map((entry, idx) => (
+                          <Cell key={`cell-${idx}`} fill={donutColors[idx % donutColors.length]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="flex justify-center gap-6 mt-4">
+                    {donutData.map((entry, idx) => (
+                      <div key={entry.name} className="flex items-center gap-2">
+                        <span
+                          className="inline-block w-3 h-3 rounded-full"
+                          style={{ backgroundColor: donutColors[idx % donutColors.length] }}
+                        ></span>
+                        <span className="text-sm">
+                          {entry.name}: <span className="font-bold">{entry.value}</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
