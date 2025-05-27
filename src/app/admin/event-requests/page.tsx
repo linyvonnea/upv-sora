@@ -2,38 +2,47 @@
 "use client";
 
 import * as React from "react";
-import { EventRequest } from "@/types/event-request";
 import { SearchBar } from "@/components/ui/search-bar";
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
-import SortModal from "@/components/ui/SortModal";
-import { FilterModal } from "@/components/ui/filter-modal";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminEventRequests } from "@/hooks/useAdminEventRequests";
 import { EventRequestTabs } from "@/components/user/event-request/EventRequestTabs";
 import { EventRequestCard } from "@/components/user/event-request/EventRequestCard";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type FilterOptions = {
   search: string;
-  modality: "" | "Online" | "On-Site";
+  modality: "" | "Online" | "On Campus" | "Off Campus";
   location: "" | "Iloilo" | "Miagao";
 };
 
 export default function AdminEventRequestsPage() {
   const { eventRequests, loading, error } = useAdminEventRequests();
-  const [isSortModalOpen, setSortModalOpen] = React.useState(false);
-  const [sortOption, setSortOption] = React.useState<{ type: string; order?: string; days?: number; }>({
-    type: "Request Date",
-    order: "Latest",
-  });
-  const [isFilterOpen, setFilterOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<FilterOptions>({
     search: "",
     modality: "",
     location: "",
   });
   const [activeTab, setActiveTab] = React.useState("All");
+  const [sortBy, setSortBy] = React.useState<"Event Date" | "Request Date">("Request Date");
+  const [sortOrder, setSortOrder] = React.useState<"Latest" | "Earliest">("Latest");
+  const [modalityFilter, setModalityFilter] = React.useState<
+    "" | "Online" | "On Campus" | "Off Campus"
+  >("");
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const pageSize = 10;
   const router = useRouter();
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, sortBy, sortOrder, activeTab]);
 
   if (loading) return <div className="p-10 text-center">Loading event requests…</div>;
   if (error) return <div className="p-10 text-red-600 text-center">{error}</div>;
@@ -44,29 +53,39 @@ export default function AdminEventRequestsPage() {
       [event.organizationName, event.title].some((field) =>
         field?.toLowerCase().includes(filters.search.toLowerCase())
       ) &&
-      (!filters.modality || event.modality === filters.modality) &&
+      (modalityFilter === "" || event.modality === modalityFilter) &&
       (!filters.location || event.location === filters.location)
   );
 
   const tabFilteredEvents =
     activeTab === "All" ? filteredEvents : filteredEvents.filter((e) => e.status === activeTab);
 
+  // Sorting logic
   const sortedEvents = [...tabFilteredEvents].sort((a, b) => {
-    if (sortOption.type === "Request Date") {
-      const dateA = new Date(a.requestDate);
-      const dateB = new Date(b.requestDate);
-      return sortOption.order === "Latest"
-        ? dateB.getTime() - dateA.getTime()
-        : dateA.getTime() - dateB.getTime();
+    let dateA: Date, dateB: Date;
+    if (sortBy === "Event Date") {
+      dateA = new Date(a.eventDate);
+      dateB = new Date(b.eventDate);
+    } else {
+      dateA = new Date(a.requestDate);
+      dateB = new Date(b.requestDate);
     }
-    return 0;
+    return sortOrder === "Latest"
+      ? dateB.getTime() - dateA.getTime()
+      : dateA.getTime() - dateB.getTime();
   });
 
+  const totalPages = Math.ceil(sortedEvents.length / pageSize);
+  const paginatedEvents = sortedEvents.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Event Requests</h1>
-      <div className="flex items-center gap-4 mb-6 w-full max-w-[1000px]">
-        <div className="max-w-3xl w-full">
+    <div className="flex flex-col justify-center min-h-screen gap-4 w-full max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-left">Event Requests</h1>
+      <div className="flex items-center gap-4 w-full max-w-[1000px]">
+        <div className="flex-grow">
           <SearchBar
             value={filters.search}
             onChange={(val) => setFilters((f) => ({ ...f, search: val }))}
@@ -74,29 +93,55 @@ export default function AdminEventRequestsPage() {
             label="Organization/Request Title"
           />
         </div>
-        <Button
-          variant="outline"
-          className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
-          onClick={() => setFilterOpen(true)}
-        >
-          Filter <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-[#284b3e] text-white hover:bg-[#284b3e]/90"
-          onClick={() => setSortModalOpen(true)}
-        >
-          Sort By <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="font-medium text-sm">Filter By:</span>
+          <select
+            className="border rounded px-2 py-1"
+            value={modalityFilter}
+            onChange={(e) =>
+              setModalityFilter(e.target.value as "" | "Online" | "On Campus" | "Off Campus")
+            }
+          >
+            <option value="">Modality</option>
+            <option value="Online">Online</option>
+            <option value="On Campus">On Campus</option>
+            <option value="Off Campus">Off Campus</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2 whitespace-nowrap">
+          <span className="font-medium text-sm">Sort By:</span>
+          <select
+            className="border rounded px-2 py-1"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as "Event Date" | "Request Date")}
+          >
+            <option value="Event Date">Event Date</option>
+            <option value="Request Date">Request Date</option>
+          </select>
+          <button
+            type="button"
+            className="ml-1 text-lg flex items-center"
+            onClick={() => setSortOrder((prev) => (prev === "Latest" ? "Earliest" : "Latest"))}
+            aria-label="Toggle sort order"
+          >
+            {sortOrder === "Latest" ? (
+              <ArrowDownWideNarrow className="w-5 h-5" />
+            ) : (
+              <ArrowUpNarrowWide className="w-5 h-5" />
+            )}
+          </button>
+        </div>
       </div>
-      <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
+      <div className="mb-4 flex justify-center">
+        <EventRequestTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
       <div className="flex flex-col items-center">
         <div className="mt-5 space-y-4 w-[1000px]">
           {sortedEvents.length === 0 && (
             <div className="text-muted-foreground text-center py-10">No event requests found.</div>
           )}
-          {sortedEvents.map((event) => (
+          {paginatedEvents.map((event) => (
             <div
               key={event.id}
               onClick={() => router.push(`/admin/event-requests/${event.id}`)}
@@ -106,20 +151,37 @@ export default function AdminEventRequestsPage() {
             </div>
           ))}
         </div>
+        {totalPages > 1 && (
+          <Pagination className="mt-6">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  aria-disabled={currentPage === 1}
+                  tabIndex={currentPage === 1 ? -1 : 0}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }).map((_, idx) => (
+                <PaginationItem key={idx}>
+                  <PaginationLink
+                    isActive={currentPage === idx + 1}
+                    onClick={() => setCurrentPage(idx + 1)}
+                  >
+                    {idx + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  aria-disabled={currentPage === totalPages}
+                  tabIndex={currentPage === totalPages ? -1 : 0}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
-      <SortModal
-        isOpen={isSortModalOpen}
-        onClose={() => setSortModalOpen(false)}
-        onApply={(option) => setSortOption(option)}
-      />
-      <FilterModal
-        isOpen={isFilterOpen}
-        onClose={() => setFilterOpen(false)}
-        onApply={(newFilters) => setFilters(newFilters)}
-        filters={filters}
-        setFilters={setFilters}
-        mode="admin"
-      />
     </div>
   );
 }

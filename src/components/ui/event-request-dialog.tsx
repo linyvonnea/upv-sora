@@ -118,6 +118,7 @@ export function EventRequestDialog({
             requestDate: new Date().toLocaleDateString("en-CA"),
             modality,
             organizationId: user.uid,
+            organizationName: user.orgName || "",
             status: "Awaiting Evaluation",
             files: uploadedFiles,
             othersLink, // Single link

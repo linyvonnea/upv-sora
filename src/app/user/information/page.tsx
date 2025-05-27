@@ -15,7 +15,7 @@ export default function InformationBoardPage() {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4 w-full max-w-5xl mx-auto">
       <div
         id="about"
         className="w-full flex items-center p-[50px] mx-auto justify-center bg-[#8E1537] rounded-lg"
@@ -58,7 +58,12 @@ export default function InformationBoardPage() {
       <OffCampusActivitySection />
 
       <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        onClick={() => {
+          const el = document.getElementById("about");
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+        }}
         className="fixed bottom-6 right-6 z-50 bg-[#8E1537] text-white p-3 rounded-full shadow-lg hover:bg-[#6c102b] transition"
         aria-label="Scroll to top"
       >

@@ -104,7 +104,6 @@ export default function AdminDashboard() {
       <div className="w-full bg-[#8E1537] rounded-lg p-[50px] mx-auto mb-8">
         <h1 className="text-2xl font-bold mb-6 text-white">Admin Dashboard</h1>
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Left: Six Stat Cards (2 columns, 3 rows) */}
           <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-6">
             <StatCard label="Total Requests" value={stats.total} />
             <StatCard label="Organizations" value={stats.orgCount} />
@@ -113,7 +112,6 @@ export default function AdminDashboard() {
             <StatCard label="Forwarded to Offices" value={stats.forwarded} />
             <StatCard label="Issues Found" value={stats.issues} />
           </div>
-          {/* Right: Two Stat Cards on top, Donut Chart below */}
           <div className="flex-1 flex flex-col gap-6 items-center">
             <div className="w-full grid grid-cols-2 gap-6">
               <StatCard label="Approved" value={stats.approved} />

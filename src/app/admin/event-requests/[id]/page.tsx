@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { EventRequest } from "@/types/event-request";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc, addDoc } from "firebase/firestore";
 
 type Params = { id: string };
 
@@ -56,6 +56,8 @@ export default function AdminEventRequestExpandedPage() {
   const { toast } = useToast();
 
   const [event, setEvent] = useState<EventRequest | null>(null);
+  const [requesterEmail, setRequesterEmail] = useState<string | null>(null);
+  const [orgName, setOrgName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string | undefined>("");
   const [requirementsChecklist, setRequirementsChecklist] = useState<Record<string, boolean>>({});
@@ -71,6 +73,7 @@ export default function AdminEventRequestExpandedPage() {
           setEvent(fetchedEvent);
           setStatus(fetchedEvent.status);
           setRequirementsChecklist(fetchedEvent.requirementsChecklist || {});
+          getRequesterNameAndEmail(fetchedEvent.organizationId);
         } else {
           setEvent(null);
         }
@@ -84,14 +87,27 @@ export default function AdminEventRequestExpandedPage() {
     setRequirementsChecklist((prev) => {
       const updated = { ...prev, [req]: !prev[req] };
       // Auto-switch to "Under Evaluation" if any box is checked
-      if (
-        status === "Awaiting Evaluation" &&
-        Object.values(updated).some((v) => v)
-      ) {
+      if (status === "Awaiting Evaluation" && Object.values(updated).some((v) => v)) {
         setStatus("Under Evaluation");
       }
       return updated;
     });
+  };
+
+  const getRequesterNameAndEmail = async (organizationId: string) => {
+    try {
+      const orgDoc = await getDoc(doc(db, "users", organizationId));
+      if (orgDoc.exists()) {
+        setRequesterEmail(orgDoc.data()?.email);
+        setOrgName(orgDoc.data()?.orgName || "Unknown Organization");
+      } else {
+        setRequesterEmail("");
+        setOrgName("");
+      }
+    } catch (error) {
+      console.error("Error fetching organization details:", error);
+      return null;
+    }
   };
 
   const handleStatusPanelSubmit = async (data: Partial<EventRequest>) => {
@@ -119,6 +135,19 @@ export default function AdminEventRequestExpandedPage() {
         description: "The event request was updated successfully.",
         variant: "success",
       });
+
+      const mailData = {
+        to: [requesterEmail],
+        template: {
+          name: "autonotif-event-update",
+          data: {
+            orgName: orgName || "Unknown Organization",
+            title: event.title || "Unknown Event",
+          },
+        },
+      };
+
+      await addDoc(collection(db, "mail"), mailData);
     } catch (err) {
       toast({
         title: "Error",
@@ -137,7 +166,7 @@ export default function AdminEventRequestExpandedPage() {
     <div className="flex gap-8 p-8 max-w-5xl mx-auto">
       {/* LEFT: Details and requirements */}
       <div className="flex-1">
-        <EventDetailsWithRequirements event={event} />
+        <EventDetailsWithRequirements event={event} orgName={orgName} />
       </div>
       {/* RIGHT: Checklist, status panel, NOA, back btn */}
       <div className="flex-1 space-y-8">
@@ -151,9 +180,7 @@ export default function AdminEventRequestExpandedPage() {
                     checked={!!requirementsChecklist[req]}
                     onCheckedChange={() => toggleChecklist(req)}
                   />
-                  <span className={!!event.files?.[req] ? "" : "text-gray-400"}>
-                    {req}
-                  </span>
+                  <span className={!!event.files?.[req] ? "" : "text-gray-400"}>{req}</span>
                 </li>
               ))}
             </ul>
