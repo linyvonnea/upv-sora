@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { logout } from "@/hooks/useAuth";
 
 export function LoginFormUser({
   className,
@@ -34,6 +35,7 @@ export function LoginFormUser({
         router.push("/user/home");
       } else {
         alert("Unauthorized: This account is not an organization.");
+        logout();
       }
     } catch (err) {
       alert("Login failed: " + (err as Error).message);
