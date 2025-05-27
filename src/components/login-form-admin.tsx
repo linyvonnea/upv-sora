@@ -48,15 +48,15 @@ export function LoginFormAdmin({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login as Admin</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-[#284b3e]">Login as Admin</CardTitle>
+          <CardDescription className="text-[#284b3e]">
             Enter your email and password to login to your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-[#284b3e]">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -67,10 +67,10 @@ export function LoginFormAdmin({
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-[#284b3e]">Password</Label>
                 <a
                   href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-[#284b3e]"
                 >
                   Forgot your password?
                 </a>
@@ -83,7 +83,11 @@ export function LoginFormAdmin({
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full bg-[#8B1832] hover:bg-[#6e1426] text-white"
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
