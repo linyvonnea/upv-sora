@@ -107,52 +107,20 @@ export default function AdminDashboard() {
           <StatCard label="Total Requests" value={stats.total} />
           <StatCard label="Organizations" value={stats.orgCount} />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <StatCard label="Awaiting Evaluation" value={stats.awaiting} />
           <StatCard label="Under Evaluation" value={stats.underEval} />
           <StatCard label="Forwarded to Offices" value={stats.forwarded} />
           <StatCard label="Issues Found" value={stats.issues} />
+        </div>
+        <div className="grid grid-cols md:grid-cols-2 gap-6 mb-6">
           <StatCard label="Approved" value={stats.approved} />
           <StatCard label="Disapproved" value={stats.disapproved} />
         </div>
       </div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard label="Online Events" value={stats.online} />
-          <StatCard label="On Campus Events" value={stats.onCampus} />
-          <StatCard label="Off Campus Events" value={stats.offCampus} />
-        </div>
-      )}
-      {/* Donut Chart and Bar Chart Section */}
+      {/* Donut Chart Section Only */}
       {!loading && (
         <div className="w-full max-w-4xl mx-auto mt-10 flex flex-col md:flex-row gap-8">
-          {/* Bar Chart */}
-          <div className="bg-white rounded-xl shadow border p-6 flex-1 flex flex-col items-center">
-            <span className="text-lg font-semibold mb-2 text-[#8E1537]">
-              Request Status Distribution
-            </span>
-            <div className="w-full flex flex-col items-center">
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={barData}>
-                  <XAxis dataKey="name" fontSize={12} />
-                  <YAxis fontSize={12} allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#8E1537" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap justify-center gap-4 mt-4">
-                {barData.map((entry, idx) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <span className="text-sm">
-                      {entry.name}: <span className="font-bold">{entry.value}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
           {/* Donut Chart */}
           <div className="bg-white rounded-xl shadow border p-6 flex-1 flex flex-col items-center">
             <span className="text-lg font-semibold mb-2 text-[#8E1537]">
