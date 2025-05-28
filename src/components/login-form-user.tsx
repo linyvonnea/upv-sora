@@ -15,11 +15,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { logout } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 export function LoginFormUser({
   className,
   ...props
-  }: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,11 +35,19 @@ export function LoginFormUser({
       if (role === "organization") {
         router.push("/user/home");
       } else {
-        alert("Unauthorized: This account is not an organization.");
+        toast({
+          title: "Unauthorized",
+          description: "This account is not an organization.",
+          variant: "destructive",
+        });
         logout();
       }
     } catch (err) {
-      alert("Login failed: " + (err as Error).message);
+      toast({
+        title: "Login failed",
+        description: (err as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -48,7 +57,9 @@ export function LoginFormUser({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl text-[#284b3e]">Login as Organization</CardTitle>
+          <CardTitle className="text-2xl text-[#284b3e]">
+            Login as Organization
+          </CardTitle>
           <CardDescription className="text-[#284b3e]">
             Enter your email and password to login to your account.
           </CardDescription>
@@ -56,7 +67,9 @@ export function LoginFormUser({
         <CardContent>
           <form onSubmit={handleLogin} className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-[#284b3e]">Email</Label>
+              <Label htmlFor="email" className="text-[#284b3e]">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -67,7 +80,9 @@ export function LoginFormUser({
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password" className="text-[#284b3e]">Password</Label>
+                <Label htmlFor="password" className="text-[#284b3e]">
+                  Password
+                </Label>
                 {/* <a
                   href="#"
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-[#284b3e]"
@@ -83,7 +98,11 @@ export function LoginFormUser({
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-[#8B1832] hover:bg-[#6e1426] text-white" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full bg-[#8B1832] hover:bg-[#6e1426] text-white"
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>

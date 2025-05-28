@@ -264,6 +264,7 @@ export function EventRequestDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-lg w-full p-8 rounded-xl max-h-[90vh] overflow-y-auto">
+        <DialogTitle className="sr-only">Event Request</DialogTitle>
         {showSuccess ? (
           <EventRequestSuccess onClose={() => setOpen(false)} />
         ) : (

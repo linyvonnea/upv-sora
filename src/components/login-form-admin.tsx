@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { logout } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 export function LoginFormAdmin({
   className,
@@ -34,11 +35,19 @@ export function LoginFormAdmin({
       if (role === "admin") {
         router.push("/admin/home");
       } else {
-        alert("Unauthorized: This account is not an admin.");
+        toast({
+          title: "Unauthorized",
+          description: "This account is not an admin.",
+          variant: "destructive",
+        });
         logout();
       }
     } catch (err) {
-      alert("Login failed: " + (err as Error).message);
+      toast({
+        title: "Login failed",
+        description: (err as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
