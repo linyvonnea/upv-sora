@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { EventRequestDialogProps } from "@/types/event-request";
 import { useAuth } from "@/contexts/AuthContext";
 import { EventRequestSuccess } from "@/components/user/event-request/EventRequestSuccess";
@@ -68,24 +68,75 @@ export function EventRequestDialog({
   const handleNext = async () => {
     if (step === 1) {
       const missing: string[] = [];
-      if (!eventName.trim()) missing.push("Name");
+      if (!eventName.trim()) missing.push("Name of Event");
       if (!eventDate) missing.push("Date of Event");
-      if (!modality) missing.push("Modality");
+
       if (missing.length > 0) {
-        toast.error(`Please fill in the following required field(s): ${missing.join(", ")}`);
+        toast({
+          title: "Required fields missing",
+          description: `Please fill in the following: ${missing.join(", ")}`,
+          variant: "destructive",
+        });
         return;
       }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const minDate = new Date();
+      minDate.setHours(0, 0, 0, 0);
+      minDate.setDate(minDate.getDate() + 5);
+      if (eventDate && eventDate < minDate) {
+        toast({
+          title: "Invalid Event Date",
+          description: "Event date must be at least 5 days from today.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (eventDate && eventDate < today) {
+        toast({
+          title: "Invalid Event Date",
+          description: "Event date cannot be in the past.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setStep(2);
     } else {
+      // Check required file uploads
+      const requiredUploads = [
+        "Request Letter",
+        "Signed Conforme of Adviser",
+        "Details of Activity",
+      ];
+      const missingUploads = requiredUploads.filter(
+        (key) => !uploadedFiles[key] || !uploadedFiles[key].url
+      );
+      if (missingUploads.length > 0) {
+        toast({
+          title: "Required File Uploads Missing",
+          description: `Please upload the following: ${missingUploads.join(", ")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (!eventDate) {
-        toast.error("Event date is missing.");
+        toast({
+          title: "Event date is missing.",
+          variant: "destructive",
+        });
         return;
       }
       const eventDateStr = eventDate.toLocaleDateString("en-CA");
 
       if (mode === "edit") {
         if (!initialData?.id) {
-          toast.error("Missing event ID for editing.");
+          toast({
+            title: "Missing event ID for editing.",
+            variant: "destructive",
+          });
           return;
         }
         try {
@@ -97,18 +148,27 @@ export function EventRequestDialog({
             eventDate: eventDateStr,
             modality,
             files: cleanedFiles,
-            othersLink, // Single link
+            othersLink,
           });
-          toast.success("Request updated successfully!");
+          toast({
+            title: "Request updated successfully!",
+            variant: "success",
+          });
           setOpen(false);
           setStep(1);
         } catch (err) {
           console.error(err);
-          toast.error("Failed to update request.");
+          toast({
+            title: "Failed to update request.",
+            variant: "destructive",
+          });
         }
       } else {
         if (!user) {
-          toast.error("You must be logged in to submit a request.");
+          toast({
+            title: "You must be logged in to submit a request.",
+            variant: "destructive",
+          });
           return;
         }
         try {
@@ -121,8 +181,12 @@ export function EventRequestDialog({
             organizationName: user.orgName || "",
             status: "Awaiting Evaluation",
             files: uploadedFiles,
-            othersLink, // Single link
+            othersLink,
             createdAt: serverTimestamp(),
+          });
+          toast({
+            title: "Request submitted successfully!",
+            variant: "success",
           });
           setShowSuccess(true);
           setStep(1);
@@ -133,7 +197,10 @@ export function EventRequestDialog({
           setOthersLink("");
         } catch (err) {
           console.error(err);
-          toast.error("Failed to submit request.");
+          toast({
+            title: "Failed to submit request.",
+            variant: "destructive",
+          });
         }
       }
     }
@@ -231,7 +298,10 @@ export function EventRequestDialog({
                 </div>
 
                 <div className="mb-2">
-                  <DatePicker selected={eventDate} onSelect={setEventDate} />
+                  <DatePicker
+                    selected={eventDate}
+                    onSelect={setEventDate}
+                  />
                 </div>
 
                 <div className="mb-8">
@@ -275,10 +345,17 @@ export function EventRequestDialog({
                   <UploadSection key={doc} title={doc} />
                 ))}
 
+                {/* Separator with OR */}
+                <div className="flex items-center my-4">
+                  <hr className="flex-grow border-t border-gray-300" />
+                  <span className="mx-3 text-gray-500 font-semibold">OR</span>
+                  <hr className="flex-grow border-t border-gray-300" />
+                </div>
+
                 {/* Others Link Field */}
                 <div>
                   <Label className="block mb-1" htmlFor="othersLink">
-                    Others (Google Drive Link)
+                    Submit Optional Files via Google Drive Link
                   </Label>
                   <Input
                     id="othersLink"
