@@ -12,7 +12,6 @@ interface DatePickerProps {
 export function DatePicker({ selected, onSelect }: DatePickerProps) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium">Date</span>
       <Popover>
         <PopoverTrigger asChild>
           <button type="button" className="w-full text-left border rounded px-3 py-2 bg-background">
