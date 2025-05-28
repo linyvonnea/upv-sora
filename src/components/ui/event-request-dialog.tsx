@@ -21,6 +21,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { EventRequestSuccess } from "@/components/user/event-request/EventRequestSuccess";
 import { FilePondUploader } from "@/components/ui/filepond-uploader";
 
+const requiredUploads = [
+  "Request Letter",
+  "Signed Conforme of Adviser",
+  "Details of Activity",
+];
+
 export function EventRequestDialog({
   open,
   setOpen,
@@ -105,11 +111,6 @@ export function EventRequestDialog({
       setStep(2);
     } else {
       // Check required file uploads
-      const requiredUploads = [
-        "Request Letter",
-        "Signed Conforme of Adviser",
-        "Details of Activity",
-      ];
       const missingUploads = requiredUploads.filter(
         (key) => !uploadedFiles[key] || !uploadedFiles[key].url
       );
@@ -241,6 +242,9 @@ export function EventRequestDialog({
     <div className="mb-4">
       <Label className="block mb-1" htmlFor={title}>
         {title}
+        {requiredUploads.includes(title) && (
+          <span className="text-red-600"> *</span>
+        )}
       </Label>
       <FilePondUploader
         initialUrl={uploadedFiles[title]?.url}
@@ -287,7 +291,7 @@ export function EventRequestDialog({
               <>
                 <div className="mb-2">
                   <Label htmlFor="event-name" className="mb-1 block">
-                    Name
+                    Name <span className="text-red-600">*</span>
                   </Label>
                   <Input
                     id="event-name"
@@ -299,6 +303,9 @@ export function EventRequestDialog({
                 </div>
 
                 <div className="mb-2">
+                  <Label htmlFor="date-of-event" className="mb-1 block">
+                    Date <span className="text-red-600">*</span>
+                  </Label>
                   <DatePicker
                     selected={eventDate}
                     onSelect={setEventDate}
