@@ -68,12 +68,12 @@ export function LoginFormAdmin({
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password" className="text-[#284b3e]">Password</Label>
-                <a
+                {/* <a
                   href="#"
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-[#284b3e]"
                 >
                   Forgot your password?
-                </a>
+                </a> */}
               </div>
               <Input
                 id="password"
