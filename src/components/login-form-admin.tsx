@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { logout } from "@/hooks/useAuth";
 
 export function LoginFormAdmin({
   className,
@@ -32,10 +33,9 @@ export function LoginFormAdmin({
       const { role } = await login(email, password);
       if (role === "admin") {
         router.push("/admin/home");
-      } else if (role === "organization") {
-        router.push("/user/home");
       } else {
-        alert("Unauthorized role.");
+        alert("Unauthorized: This account is not an admin.");
+        logout();
       }
     } catch (err) {
       alert("Login failed: " + (err as Error).message);
@@ -68,12 +68,12 @@ export function LoginFormAdmin({
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password" className="text-[#284b3e]">Password</Label>
-                <a
+                {/* <a
                   href="#"
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-[#284b3e]"
                 >
                   Forgot your password?
-                </a>
+                </a> */}
               </div>
               <Input
                 id="password"
