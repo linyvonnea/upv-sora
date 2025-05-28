@@ -16,6 +16,14 @@ export function OffCampusActivitySection() {
       <h2 className="text-xl font-semibold mb-4 text-[#8E1537]">Off Campus Activity</h2>
       <div className="bg-white rounded-lg shadow p-6 border w-full">
         <h3 className="text-xl font-semibold text-[#8E1537] mb-2">Requirements</h3>
+        <a
+          href="https://drive.google.com/drive/folders/19_zBtUBtKYIaxL-V9b1BLRf6462zn-_u"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 underline text-sm mb-2 inline-block"
+        >
+          Download Requirement Forms Here
+        </a>
         <ul className="list-disc list-inside text-gray-700 space-y-1 grid grid-cols-1 md:grid-cols-2 gap-x-8">
           <li>Request Letter</li>
           <li>Signed Conforme of Adviser</li>
