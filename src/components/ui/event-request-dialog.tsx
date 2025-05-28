@@ -275,10 +275,17 @@ export function EventRequestDialog({
                   <UploadSection key={doc} title={doc} />
                 ))}
 
+                {/* Separator with OR */}
+                <div className="flex items-center my-4">
+                  <hr className="flex-grow border-t border-gray-300" />
+                  <span className="mx-3 text-gray-500 font-semibold">OR</span>
+                  <hr className="flex-grow border-t border-gray-300" />
+                </div>
+
                 {/* Others Link Field */}
                 <div>
                   <Label className="block mb-1" htmlFor="othersLink">
-                    Others (Google Drive Link)
+                    Submit Optional Files via Google Drive Link
                   </Label>
                   <Input
                     id="othersLink"
