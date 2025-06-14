@@ -16,34 +16,30 @@ A request management system for student organizations at UP Visayas. Built to st
 
 ## 🖼️ Screenshots
 
+
 ### User Side
-**Home Screen**  
-![Home Screen](<img width="1439" alt="image" src="https://github.com/user-attachments/assets/3ce20fd6-44cc-4660-9f58-aec91600ee93" />
-)
 
-**Request Form**  
-![Step 1](<img width="1423" alt="image" src="https://github.com/user-attachments/assets/d672658d-6ad5-4363-a797-434be25060f3" />
-)
+<h4>Home Screen</h4>
+<img src="https://github.com/user-attachments/assets/3ce20fd6-44cc-4660-9f58-aec91600ee93" alt="Home Screen" width="80%" />
 
-**Event Request History**  
-![History](<img width="1436" alt="image" src="https://github.com/user-attachments/assets/3350efa1-c069-4f69-8e6b-cdd0fc9a7dbb" />
-)
+<h4>Request Form</h4>
+<img src="https://github.com/user-attachments/assets/d672658d-6ad5-4363-a797-434be25060f3" alt="Request Form" width="80%" />
+
+<h4>Event Request History</h4>
+<img src="https://github.com/user-attachments/assets/3350efa1-c069-4f69-8e6b-cdd0fc9a7dbb" alt="Request History" width="80%" />
 
 ---
 
 ### Admin Side
 
-**Dashboard**
-![Admin Dashboard](<img width="1440" alt="image" src="https://github.com/user-attachments/assets/3a00c40a-e33b-4a60-b064-63d53f7aa5ea" />
-)
-**Event Requests List**  
-![Admin List](<img width="1437" alt="image" src="https://github.com/user-attachments/assets/01b82bb0-7263-451a-9c25-6b66bbf26c29" />
-)
+<h4>Dashboard</h4>
+<img src="https://github.com/user-attachments/assets/3a00c40a-e33b-4a60-b064-63d53f7aa5ea" alt="Dashboard" width="80%" />
 
-**Expanded View**  
-![Admin Detail](<img width="1188" alt="image" src="https://github.com/user-attachments/assets/f8549f3d-55da-4516-a186-7d462ef18d79" />
-)
+<h4>Event Requests List</h4>
+<img src="https://github.com/user-attachments/assets/01b82bb0-7263-451a-9c25-6b66bbf26c29" alt="Admin List" width="80%" />
 
+<h4>Expanded View</h4>
+<img src="https://github.com/user-attachments/assets/f8549f3d-55da-4516-a186-7d462ef18d79" alt="Expanded View" width="80%" />
 ---
 
 ## 🛠️ Tech Stack
