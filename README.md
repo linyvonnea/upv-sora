@@ -1,3 +1,63 @@
+# 🗂️ UPV-SORA
+
+A request management system for student organizations at UP Visayas. Built to streamline event and pubmat request workflows between students and admins.
+
+---
+
+## 🚀 Features
+
+- Multi-step event request form with modality-specific requirements
+- Pubmat request submission with file uploads
+- History view with status tracking and file previews
+- Admin dashboard with filtering, checklist, and forwarding tools
+- Firebase authentication, Firestore storage, and real-time updates
+
+---
+
+## 🖼️ Screenshots
+
+### User Side
+**Home Screen**  
+![Home Screen](<img width="1439" alt="image" src="https://github.com/user-attachments/assets/3ce20fd6-44cc-4660-9f58-aec91600ee93" />
+)
+
+**Request Form**  
+![Step 1](<img width="1423" alt="image" src="https://github.com/user-attachments/assets/d672658d-6ad5-4363-a797-434be25060f3" />
+)
+
+**Event Request History**  
+![History](<img width="1436" alt="image" src="https://github.com/user-attachments/assets/3350efa1-c069-4f69-8e6b-cdd0fc9a7dbb" />
+)
+
+---
+
+### Admin Side
+
+**Dashboard**
+![Admin Dashboard](<img width="1440" alt="image" src="https://github.com/user-attachments/assets/3a00c40a-e33b-4a60-b064-63d53f7aa5ea" />
+)
+**Event Requests List**  
+![Admin List](<img width="1437" alt="image" src="https://github.com/user-attachments/assets/01b82bb0-7263-451a-9c25-6b66bbf26c29" />
+)
+
+**Expanded View**  
+![Admin Detail](<img width="1188" alt="image" src="https://github.com/user-attachments/assets/f8549f3d-55da-4516-a186-7d462ef18d79" />
+)
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React, Next.js, Tailwind CSS
+- **Backend:** Firebase Auth, Firestore, Storage
+- **File Upload:** ImageKit.io + FilePond
+- **Design System:** shadcn/ui, Lucide Icons
+
+---
+
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
